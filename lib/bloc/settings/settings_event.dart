@@ -1,3 +1,4 @@
+import '../../../data/models/hadith_collection.dart';
 import '../../../data/models/user_settings.dart';
 import 'package:equatable/equatable.dart';
 

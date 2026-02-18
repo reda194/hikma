@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../models/hadith_collection.dart';
 import '../models/user_settings.dart';
 import '../../core/constants/storage_keys.dart';
 

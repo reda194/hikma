@@ -95,6 +95,20 @@ class Hadith extends Equatable {
     );
   }
 
+  /// Create an empty Hadith placeholder
+  factory Hadith.empty() {
+    return const Hadith(
+      id: '',
+      arabicText: '',
+      narrator: '',
+      sourceBook: '',
+      chapter: '',
+      bookNumber: 0,
+      hadithNumber: 0,
+      collection: HadithCollection.all,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

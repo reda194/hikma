@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:window_manager/window_manager.dart';
@@ -27,6 +28,7 @@ import 'bloc/popup/popup_state.dart';
 import 'data/repositories/hadith_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'data/repositories/favorites_repository.dart';
+import 'data/models/hadith.dart';
 import 'ui/screens/settings_screen.dart';
 import 'ui/screens/favorites_screen.dart';
 import 'ui/screens/about_screen.dart';
@@ -73,6 +75,10 @@ class _HikmaAppState extends State<HikmaApp> {
   void initState() {
     super.initState();
     _initializeRepositories();
+    _menuBarManager = MenuBarManager(
+      hadithBloc: _hadithBloc,
+      popupBloc: _popupBloc,
+    );
   }
 
   void _initializeRepositories() {
@@ -81,41 +87,43 @@ class _HikmaAppState extends State<HikmaApp> {
     _hadithRepository = HadithRepository();
 
     // Initialize BLoCs
-    _settingsBloc = SettingsBloc(_settingsRepository);
-    _favoritesBloc = FavoritesBloc(_favoritesRepository);
-    _popupBloc = PopupBloc(_settingsRepository);
-    _hadithBloc = HadithBloc(_hadithRepository, _favoritesBloc);
-    _schedulerBloc = SchedulerBloc(_settingsBloc, _popupBloc, _hadithBloc);
+    _settingsBloc = SettingsBloc(settingsRepository: _settingsRepository);
+    _favoritesBloc = FavoritesBloc(favoritesRepository: _favoritesRepository);
+    _popupBloc = PopupBloc(settingsRepository: _settingsRepository);
+    _hadithBloc = HadithBloc(hadithRepository: _hadithRepository);
+    _schedulerBloc = SchedulerBloc(
+      settingsRepository: _settingsRepository,
+      hadithBloc: _hadithBloc,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create (_) => _settingsBloc),
-        BlocProvider(create (_) => _favoritesBloc),
-        BlocProvider(create (_) => _popupBloc),
-        BlocProvider(create (_) => _hadithBloc),
-        BlocProvider(create (_) => _schedulerBloc),
+        BlocProvider<SettingsBloc>.value(value: _settingsBloc),
+        BlocProvider<FavoritesBloc>.value(value: _favoritesBloc),
+        BlocProvider<PopupBloc>.value(value: _popupBloc),
+        BlocProvider<HadithBloc>.value(value: _hadithBloc),
+        BlocProvider<SchedulerBloc>.value(value: _schedulerBloc),
       ],
       child: MaterialApp(
         title: 'Hikma',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
+        navigatorKey: MenuBarManager.navigatorKey,
         home: HikmaHome(
           menuBarManager: _menuBarManager,
           settingsBloc: _settingsBloc,
           schedulerBloc: _schedulerBloc,
+          favoritesBloc: _favoritesBloc,
+          hadithBloc: _hadithBloc,
+          popupBloc: _popupBloc,
         ),
         routes: {
-          '/settings': (context) => SettingsScreen(
-                hadithBloc: _hadithBloc,
-                favoritesBloc: _favoritesBloc,
-              ),
-          '/favorites': (context) => FavoritesScreen(
-                favoritesBloc: _favoritesBloc,
-              ),
+          '/settings': (context) => const SettingsScreen(),
+          '/favorites': (context) => const FavoritesScreen(),
           '/about': (context) => const AboutScreen(),
         },
         debugShowCheckedModeBanner: false,
@@ -138,12 +146,18 @@ class HikmaHome extends StatefulWidget {
   final MenuBarManager menuBarManager;
   final SettingsBloc settingsBloc;
   final SchedulerBloc schedulerBloc;
+  final FavoritesBloc favoritesBloc;
+  final HadithBloc hadithBloc;
+  final PopupBloc popupBloc;
 
   const HikmaHome({
     super.key,
     required this.menuBarManager,
     required this.settingsBloc,
     required this.schedulerBloc,
+    required this.favoritesBloc,
+    required this.hadithBloc,
+    required this.popupBloc,
   });
 
   @override
@@ -160,16 +174,11 @@ class _HikmaHomeState extends State<HikmaHome> {
   }
 
   Future<void> _initialize() async {
-    // Initialize repositories
-    await widget.settingsBloc.repository.init();
-    await widget.schedulerBloc.hadithBloc.repository.init();
-    await widget.schedulerBloc.favoritesBloc.repository.init();
-
     // Load initial settings
-    widget.settingsBloc.add(LoadSettings());
+    widget.settingsBloc.add(const LoadSettings());
 
     // Load favorites
-    widget.schedulerBloc.favoritesBloc.add(LoadFavorites());
+    widget.favoritesBloc.add(const LoadFavorites());
 
     // Initialize menu bar
     await widget.menuBarManager.init();
@@ -195,74 +204,75 @@ class _HikmaHomeState extends State<HikmaHome> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SchedulerState>(
+    return BlocListener<SchedulerBloc, SchedulerState>(
       bloc: widget.schedulerBloc,
       listener: (context, state) {
         if (state is SchedulerRunning) {
           // Scheduler is running
         }
       },
-      child: BlocListener<PopupState>(
-        bloc: widget.schedulerBloc.popupBloc,
+      child: BlocListener<PopupBloc, PopupState>(
+        bloc: widget.popupBloc,
         listener: (context, state) {
           if (state is PopupVisible) {
-            _showPopup(state.hadith);
+            // Get hadith from HadithBloc state
+            final hadithState = widget.hadithBloc.state;
+            if (hadithState is HadithLoaded) {
+              _showPopup(hadithState.hadith);
+            }
           }
         },
-        child: Acrylic(
-          type: AcrylicType.frosted,
-          child: Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.nights_stay,
-                    size: 64,
+        child: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.nights_stay,
+                  size: 64,
+                  color: const Color(0xFF1B4F72),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Hikma',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                     color: const Color(0xFF1B4F72),
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Hikma',
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1B4F72),
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Hadith Reminder for macOS',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: const Color(0xFF7F8C8D),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Hadith Reminder for macOS',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: const Color(0xFF7F8C8D),
-                    ),
+                ),
+                const SizedBox(height: 32),
+                if (!_isInitialized)
+                  const CircularProgressIndicator()
+                else
+                  Column(
+                    children: [
+                      Text(
+                        'Running in background',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: const Color(0xFF2C3E50),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Use the menu bar icon to access features',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: const Color(0xFF95A5A6),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 32),
-                  if (!_isInitialized)
-                    const CircularProgressIndicator()
-                  else
-                    Column(
-                      children: [
-                        Text(
-                          'Running in background',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: const Color(0xFF2C3E50),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Use the menu bar icon to access features',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: const Color(0xFF95A5A6),
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
+              ],
             ),
           ),
         ),
@@ -270,7 +280,7 @@ class _HikmaHomeState extends State<HikmaHome> {
     );
   }
 
-  void _showPopup(dynamic hadith) {
+  void _showPopup(Hadith hadith) {
     // Navigate to popup overlay
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -280,16 +290,5 @@ class _HikmaHomeState extends State<HikmaHome> {
         opaque: false,
       ),
     );
-  }
-}
-
-class HadithPopupOverlay extends StatelessWidget {
-  final dynamic hadith;
-
-  const HadithPopupOverlay({super.key, required this.hadith});
-
-  @override
-  Widget build(BuildContext context) {
-    return HadithPopup(hadith: hadith);
   }
 }

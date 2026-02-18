@@ -34,7 +34,7 @@ class FavoritesLoaded extends FavoritesState {
     Set<String>? favoriteIds,
   }) {
     return FavoritesLoaded(
-      favorites: favorites ?? this.favoriteIds,
+      favorites: favorites ?? this.favorites,
       favoriteIds: favoriteIds ?? this.favoriteIds,
     );
   }

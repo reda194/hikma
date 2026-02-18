@@ -13,15 +13,14 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.primaryLight,
         surface: AppColors.surface,
-        background: AppColors.background,
         error: AppColors.error,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: AppColors.white,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
       ),
       appBarTheme: const AppBarTheme(
@@ -79,7 +78,6 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.primaryLight,
         surface: const Color(0xFF1E1E1E),
-        background: const Color(0xFF121212),
       ),
       scaffoldBackgroundColor: const Color(0xFF121212),
     );

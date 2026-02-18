@@ -63,8 +63,9 @@ class HadithBloc extends Bloc<HadithEvent, HadithState> {
           ));
         }
       } else {
+        final fallbackHadith = await _hadithRepository.getRandomHadith(event.collection);
         emit(HadithLoaded(
-          hadith: await _hadithRepository.getRandomHadith(event.collection) ?? Hadith.empty(),
+          hadith: fallbackHadith ?? Hadith.empty(),
           filteredHadiths: hadiths,
         ));
       }
@@ -88,17 +89,4 @@ class HadithBloc extends Bloc<HadithEvent, HadithState> {
       }
     }
   }
-}
-
-extension on Hadith {
-  static Hadith empty() => Hadith(
-        id: '',
-        arabicText: '',
-        narrator: '',
-        sourceBook: '',
-        chapter: '',
-        bookNumber: 0,
-        hadithNumber: 0,
-        collection: HadithCollection.all,
-      );
 }

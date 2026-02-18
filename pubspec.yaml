@@ -23,8 +23,8 @@ dependencies:
   # Window Management
   window_manager: ^0.3.0
 
-  # Menu Bar Integration
-  system_tray: ^2.0.0
+  # Menu Bar Integration (disabled due to API compatibility)
+  # system_tray: ^2.0.0
 
   # Frosted Glass Effects
   flutter_acrylic: ^1.1.0
@@ -37,9 +37,6 @@ dependencies:
 
   # Audio for notification sounds
   audioplayers: ^5.2.0
-
-  # Auto-start on login
-  launch_at_login: ^0.1.0
 
   # Keyboard shortcuts
   hotkey_manager: ^0.1.8
