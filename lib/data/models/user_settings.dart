@@ -10,6 +10,7 @@ class UserSettings extends Equatable {
   final bool soundEnabled;
   final bool autoStartEnabled;
   final bool showInDock;
+  final bool darkModeEnabled;
   final PopupPosition? popupPosition;
 
   const UserSettings({
@@ -20,6 +21,7 @@ class UserSettings extends Equatable {
     this.soundEnabled = false,
     this.autoStartEnabled = true,
     this.showInDock = false,
+    this.darkModeEnabled = false,
     this.popupPosition,
   });
 
@@ -31,6 +33,7 @@ class UserSettings extends Equatable {
     bool? soundEnabled,
     bool? autoStartEnabled,
     bool? showInDock,
+    bool? darkModeEnabled,
     PopupPosition? popupPosition,
   }) {
     return UserSettings(
@@ -41,6 +44,7 @@ class UserSettings extends Equatable {
       soundEnabled: soundEnabled ?? this.soundEnabled,
       autoStartEnabled: autoStartEnabled ?? this.autoStartEnabled,
       showInDock: showInDock ?? this.showInDock,
+      darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       popupPosition: popupPosition ?? this.popupPosition,
     );
   }
@@ -54,6 +58,7 @@ class UserSettings extends Equatable {
       'soundEnabled': soundEnabled,
       'autoStartEnabled': autoStartEnabled,
       'showInDock': showInDock,
+      'darkModeEnabled': darkModeEnabled,
       if (popupPosition != null) 'popupPosition': popupPosition!.toJson(),
     };
   }
@@ -75,6 +80,7 @@ class UserSettings extends Equatable {
       soundEnabled: json['soundEnabled'] as bool? ?? false,
       autoStartEnabled: json['autoStartEnabled'] as bool? ?? true,
       showInDock: json['showInDock'] as bool? ?? false,
+      darkModeEnabled: json['darkModeEnabled'] as bool? ?? false,
       popupPosition: json['popupPosition'] != null
           ? PopupPosition.fromJson(
               json['popupPosition'] as Map<String, dynamic>,
@@ -92,6 +98,7 @@ class UserSettings extends Equatable {
         soundEnabled,
         autoStartEnabled,
         showInDock,
+        darkModeEnabled,
         popupPosition,
       ];
 }

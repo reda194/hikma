@@ -94,3 +94,13 @@ class ToggleShowInDock extends SettingsEvent {
   @override
   List<Object?> get props => [enabled];
 }
+
+/// Event to toggle dark mode
+class ToggleDarkMode extends SettingsEvent {
+  final bool enabled;
+
+  const ToggleDarkMode(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}

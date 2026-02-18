@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 
 import '../../bloc/hadith/hadith_bloc.dart';
 import '../../bloc/hadith/hadith_event.dart';
@@ -20,6 +21,7 @@ class MenuBarManager {
       GlobalKey<NavigatorState>();
 
   bool _isInitialized = false;
+  HotKey? _hadithHotKey;
 
   MenuBarManager({
     required HadithBloc hadithBloc,
@@ -31,6 +33,9 @@ class MenuBarManager {
   Future<void> init() async {
     if (_isInitialized) return;
 
+    // Register keyboard shortcut for showing Hadith (Cmd+Shift+H)
+    await _registerKeyboardShortcut();
+
     // TODO: Re-implement with system_tray 2.0+ API
     // The system_tray package API has changed significantly
     // For now, the app will run without system tray functionality
@@ -38,8 +43,40 @@ class MenuBarManager {
     _isInitialized = true;
   }
 
+  /// Register the Cmd+Shift+H hotkey for showing a Hadith popup
+  Future<void> _registerKeyboardShortcut() async {
+    _hadithHotKey = HotKey(
+      key: PhysicalKeyboardKey.keyH,
+      modifiers: [HotKeyModifier.command, HotKeyModifier.shift],
+      scope: HotKeyScope.system,
+    );
+
+    await hotKeyManager.register(
+      _hadithHotKey!,
+      keyDownHandler: (hotKey) {
+        _showHadith();
+      },
+    );
+  }
+
+  /// Dispose resources
+  Future<void> dispose() async {
+    if (_hadithHotKey != null) {
+      await hotKeyManager.unregister(_hadithHotKey!);
+      _hadithHotKey = null;
+    }
+  }
+
   void _showHadith() {
     _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
+    // Small delay to let Hadith load, then show popup
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _popupBloc.add(const ShowPopup(hadithId: ''));
+    });
+  }
+
+  void _showDailyHadith() {
+    _hadithBloc.add(const LoadDailyHadith());
     // Small delay to let Hadith load, then show popup
     Future.delayed(const Duration(milliseconds: 300), () {
       _popupBloc.add(const ShowPopup(hadithId: ''));
@@ -56,6 +93,10 @@ class MenuBarManager {
 
   void _showAbout() {
     navigatorKey.currentState?.pushNamed('/about');
+  }
+
+  void _showContemplationMode() {
+    navigatorKey.currentState?.pushNamed('/contemplation');
   }
 
   Future<void> _quit() async {

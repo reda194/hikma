@@ -21,7 +21,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleSound>(_onToggleSound);
     on<ToggleAutoStart>(_onToggleAutoStart);
     on<ToggleShowInDock>(_onToggleShowInDock);
+    on<ToggleDarkMode>(_onToggleDarkMode);
   }
+
+  /// Expose repository for external initialization
+  SettingsRepository get repository => _settingsRepository;
 
   /// Handle LoadSettings event
   Future<void> _onLoadSettings(
@@ -186,6 +190,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final currentState = state as SettingsLoaded;
       final updatedSettings = currentState.settings.copyWith(
         showInDock: event.enabled,
+      );
+
+      await _settingsRepository.saveSettings(updatedSettings);
+      emit(SettingsLoaded(settings: updatedSettings));
+    } catch (e) {
+      // Keep current state on error
+    }
+  }
+
+  /// Handle ToggleDarkMode event
+  Future<void> _onToggleDarkMode(
+    ToggleDarkMode event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state is! SettingsLoaded) return;
+
+    try {
+      final currentState = state as SettingsLoaded;
+      final updatedSettings = currentState.settings.copyWith(
+        darkModeEnabled: event.enabled,
       );
 
       await _settingsRepository.saveSettings(updatedSettings);
