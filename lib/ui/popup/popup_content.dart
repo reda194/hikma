@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/hadith.dart';
@@ -78,6 +79,13 @@ class _PopupContentState extends State<PopupContent> {
             Flexible(
               child: BlocBuilder<HadithBloc, HadithState>(
                 builder: (context, hadithState) {
+                  if (hadithState is HadithError) {
+                    return _buildErrorState(hadithState as HadithError);
+                  }
+                  if (hadithState is HadithLoading) {
+                    return _buildLoadingState();
+                  }
+
                   final hadith = _currentHadith ??
                       (hadithState is HadithLoaded ? hadithState.hadith : null);
 
@@ -212,6 +220,39 @@ class _PopupContentState extends State<PopupContent> {
     );
   }
 
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.library_books_rounded,
+            color: AppColors.white.withOpacity(0.7),
+            size: 48,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Hadiths available',
+            style: GoogleFonts.notoNaskhArabic(
+              fontSize: 18,
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please check your data files and restart the app',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.white.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActionBar(BuildContext context) {
     final hadith = _currentHadith ??
         (context.read<HadithBloc>().state is HadithLoaded
@@ -251,15 +292,16 @@ class _PopupContentState extends State<PopupContent> {
               _ActionButton(
                 icon: Icons.copy_rounded,
                 label: 'Copy',
-                onTap: () {
-                  // Copy text to clipboard
-                  // Clipboard.setData(ClipboardData(text: hadith.arabicText));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Hadith copied to clipboard'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
+                onTap: () async {
+                  await _copyHadithToClipboard(hadith);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Hadith copied to clipboard'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 },
               ),
               _ActionButton(
@@ -295,6 +337,60 @@ class _PopupContentState extends State<PopupContent> {
         valueColor: AlwaysStoppedAnimation<Color>(
           AppColors.white.withOpacity(0.8),
         ),
+      ),
+    );
+  }
+
+  /// Copy Hadith to clipboard with formatting
+  /// Format: "Arabic text — Narrator | Source"
+  Future<void> _copyHadithToClipboard(Hadith hadith) async {
+    final formattedText = '${hadith.arabicText} — ${hadith.narrator} | ${hadith.sourceBook}';
+    await Clipboard.setData(ClipboardData(text: formattedText));
+  }
+
+  Widget _buildErrorState(HadithError errorState) {
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: AppColors.white.withOpacity(0.7),
+            size: 48,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Could not load Hadith',
+            style: GoogleFonts.notoNaskhArabic(
+              fontSize: 18,
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please check your connection and try again',
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.white.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.read<HadithBloc>().add(
+                const FetchRandomHadith(collection: HadithCollection.all),
+              );
+            },
+            icon: const Icon(Icons.refresh_rounded),
+            label: 'Try Again',
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.white.withOpacity(0.2),
+              foregroundColor: AppColors.white,
+            ),
+          ),
+        ],
       ),
     );
   }

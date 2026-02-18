@@ -41,6 +41,10 @@ dependencies:
   # Keyboard shortcuts
   hotkey_manager: ^0.1.8
 
+  # Auto-start at login (TODO: Requires native macOS implementation)
+  # launch_at_login package is incompatible with Dart 3.9+
+  # Using native macOS APIs instead - see lib/data/services/launch_service.dart
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -53,3 +57,4 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
+    - assets/sounds/

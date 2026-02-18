@@ -6,7 +6,9 @@ import '../../data/models/user_settings.dart';
 import '../../bloc/settings/settings_bloc.dart';
 import '../../bloc/settings/settings_state.dart';
 import '../../bloc/settings/settings_event.dart';
+import '../../bloc/hadith/hadith_bloc.dart';
 import '../../core/theme/app_colors.dart';
+import '../widgets/stats_widget.dart';
 import 'about_screen.dart';
 
 /// SettingsScreen - User settings and preferences
@@ -55,6 +57,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              // Statistics Section
+              const StatsWidget(),
+
+              const SizedBox(height: 16),
+
               // Display Settings Section
               _buildSectionHeader('Display', Icons.palette_outlined),
               _buildCard(

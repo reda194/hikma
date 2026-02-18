@@ -1,5 +1,6 @@
 import '../models/hadith.dart';
 import '../models/hadith_collection.dart';
+import '../models/read_statistics.dart';
 import '../services/hadith_api_service.dart';
 import '../services/local_hadith_service.dart';
 import '../services/connectivity_service.dart';
@@ -175,4 +176,108 @@ class HadithRepository {
 
   /// Get count of local Hadiths
   Future<int> get localCount => _localService.count;
+
+  /// Save Hadith view history to Hive
+  Future<void> saveHistory(List<String> history) async {
+    await _cacheBox.put(StorageKeys.hadithHistory, history);
+  }
+
+  /// Load Hadith view history from Hive
+  Future<List<String>> loadHistory() async {
+    final history = _cacheBox.get(StorageKeys.hadithHistory);
+    if (history != null && history is List) {
+      return history.cast<String>();
+    }
+    return [];
+  }
+
+  /// Get a random Hadith excluding specific IDs
+  Future<Hadith?> getRandomHadithExcluding({
+    required List<String> excludeIds,
+    HadithCollection? collection,
+  }) async {
+    // Try to get from API excluding history
+    final collectionValue = collection?.apiValue ?? 'all';
+
+    // Try local service with exclusion
+    return await _localService.getRandomHadithExcluding(
+      excludeIds: excludeIds,
+      collection: collection,
+    );
+  }
+
+  /// Get today's featured Hadith
+  /// Returns the stored daily Hadith if today's date matches, otherwise refreshes
+  Future<Hadith?> getDailyHadith() async {
+    final storedDate = _cacheBox.get(StorageKeys.dailyHadithDate) as String?;
+    final storedId = _cacheBox.get(StorageKeys.dailyHadithId) as String?;
+
+    final today = _getTodayDateString();
+
+    // If stored date matches today, return the stored Hadith
+    if (storedDate == today && storedId != null) {
+      final hadith = await getHadithById(storedId);
+      if (hadith != null) {
+        return hadith;
+      }
+    }
+
+    // Otherwise, refresh the daily Hadith
+    return await refreshDailyHadith();
+  }
+
+  /// Refresh today's featured Hadith with a new random selection
+  Future<Hadith?> refreshDailyHadith() async {
+    // Get a new random Hadith
+    final newHadith = await getRandomHadith(HadithCollection.all);
+    if (newHadith == null) {
+      return null;
+    }
+
+    // Store the daily Hadith info
+    final today = _getTodayDateString();
+    await _cacheBox.put(StorageKeys.dailyHadithDate, today);
+    await _cacheBox.put(StorageKeys.dailyHadithId, newHadith.id);
+
+    return newHadith;
+  }
+
+  /// Get today's date as a string (YYYY-MM-DD)
+  String _getTodayDateString() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Get reading statistics
+  Future<ReadStatistics> getReadStatistics() async {
+    final data = _cacheBox.get(StorageKeys.readStatistics);
+    if (data != null && data is Map<String, dynamic>) {
+      return ReadStatistics.fromJson(data);
+    }
+    return const ReadStatistics();
+  }
+
+  /// Save reading statistics
+  Future<void> saveReadStatistics(ReadStatistics statistics) async {
+    await _cacheBox.put(StorageKeys.readStatistics, statistics.toJson());
+  }
+
+  /// Increment read count for today
+  Future<void> incrementReadCount() async {
+    final statistics = await getReadStatistics();
+    final updated = statistics.incrementToday();
+    await saveReadStatistics(updated);
+  }
+
+  /// Get today's read count
+  Future<int> getTodayReadCount() async {
+    final statistics = await getReadStatistics();
+    return statistics.getTodayCount();
+  }
+
+  /// Get this week's read count
+  Future<int> getWeekReadCount() async {
+    final statistics = await getReadStatistics();
+    return statistics.getWeekCount();
+  }
 }
