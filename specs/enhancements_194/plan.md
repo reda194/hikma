@@ -160,3 +160,4 @@ test/
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | N/A | No violations | Constitution passed without issues |
+
