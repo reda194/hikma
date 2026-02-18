@@ -38,3 +38,27 @@ class CacheHadith extends HadithEvent {
   @override
   List<Object?> get props => [hadithId];
 }
+
+/// Event to load today's featured Hadith
+class LoadDailyHadith extends HadithEvent {
+  const LoadDailyHadith();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Event to refresh today's featured Hadith
+class RefreshDailyHadith extends HadithEvent {
+  const RefreshDailyHadith();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Event to increment the read count for today
+class IncrementReadCount extends HadithEvent {
+  const IncrementReadCount();
+
+  @override
+  List<Object?> get props => [];
+}

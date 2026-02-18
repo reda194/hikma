@@ -15,7 +15,18 @@ class StorageKeys {
   static const String soundEnabled = 'sound_enabled';
   static const String autoStart = 'auto_start';
   static const String showInDock = 'show_in_dock';
+  static const String darkModeEnabled = 'dark_mode_enabled';
   static const String popupPosition = 'popup_position';
+
+  // Daily Hadith keys
+  static const String dailyHadithId = 'daily_hadith_id';
+  static const String dailyHadithDate = 'daily_hadith_date';
+
+  // Hadith history key
+  static const String hadithHistory = 'hadith_history';
+
+  // Reading statistics key
+  static const String readStatistics = 'read_statistics';
 
   // Cache keys
   static const String cachePrefix = 'cached_';

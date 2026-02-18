@@ -36,6 +36,8 @@ class SettingsRepository {
         _settingsBox.get(StorageKeys.autoStart, defaultValue: true);
     final showInDock =
         _settingsBox.get(StorageKeys.showInDock, defaultValue: false);
+    final darkMode =
+        _settingsBox.get(StorageKeys.darkModeEnabled, defaultValue: false);
 
     final positionData = _settingsBox.get(StorageKeys.popupPosition);
 
@@ -47,6 +49,7 @@ class SettingsRepository {
       soundEnabled: sound as bool,
       autoStartEnabled: autoStart as bool,
       showInDock: showInDock as bool,
+      darkModeEnabled: darkMode as bool,
       popupPosition: positionData != null
           ? PopupPosition.fromJson(positionData as Map<String, dynamic>)
           : null,
@@ -84,6 +87,10 @@ class SettingsRepository {
     await _settingsBox.put(
       StorageKeys.showInDock,
       settings.showInDock,
+    );
+    await _settingsBox.put(
+      StorageKeys.darkModeEnabled,
+      settings.darkModeEnabled,
     );
 
     if (settings.popupPosition != null) {

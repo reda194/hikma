@@ -2,19 +2,23 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/models/user_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
+import '../../../data/services/audio_service.dart';
 import 'popup_event.dart';
 import 'popup_state.dart';
 
 /// PopupBloc manages popup visibility, position, and auto-dismiss behavior
 class PopupBloc extends Bloc<PopupEvent, PopupState> {
   final SettingsRepository _settingsRepository;
+  final AudioService _audioService;
 
   Timer? _autoDismissTimer;
   int _remainingSeconds = 0;
 
   PopupBloc({
     required SettingsRepository settingsRepository,
+    AudioService? audioService,
   })  : _settingsRepository = settingsRepository,
+        _audioService = audioService ?? AudioService(),
         super(const PopupHidden()) {
     on<ShowPopup>(_onShowPopup);
     on<HidePopup>(_onHidePopup);
@@ -34,6 +38,12 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
     ShowPopup event,
     Emitter<PopupState> emit,
   ) async {
+    // Play notification sound if enabled
+    final settings = await _settingsRepository.loadSettings();
+    if (settings.soundEnabled) {
+      _audioService.playNotificationSound();
+    }
+
     PopupPosition? position = event.position;
 
     if (position == null) {

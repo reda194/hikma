@@ -23,24 +23,32 @@ class HadithLoading extends HadithState {
 class HadithLoaded extends HadithState {
   final Hadith hadith;
   final List<Hadith> filteredHadiths;
+  final List<String> recentlyShownIds;
+  final Hadith? dailyHadith;
 
   const HadithLoaded({
     required this.hadith,
     this.filteredHadiths = const [],
+    this.recentlyShownIds = const [],
+    this.dailyHadith,
   });
 
   HadithLoaded copyWith({
     Hadith? hadith,
     List<Hadith>? filteredHadiths,
+    List<String>? recentlyShownIds,
+    Hadith? dailyHadith,
   }) {
     return HadithLoaded(
       hadith: hadith ?? this.hadith,
       filteredHadiths: filteredHadiths ?? this.filteredHadiths,
+      recentlyShownIds: recentlyShownIds ?? this.recentlyShownIds,
+      dailyHadith: dailyHadith ?? this.dailyHadith,
     );
   }
 
   @override
-  List<Object?> get props => [hadith, filteredHadiths];
+  List<Object?> get props => [hadith, filteredHadiths, recentlyShownIds, dailyHadith];
 }
 
 /// Error state when Hadith loading fails

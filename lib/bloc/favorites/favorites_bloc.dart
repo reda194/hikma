@@ -17,6 +17,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     on<ToggleFavorite>(_onToggleFavorite);
     on<IsFavorite>(_onIsFavorite);
     on<ClearFavorites>(_onClearFavorites);
+    on<SearchFavorites>(_onSearchFavorites);
   }
 
   /// Handle LoadFavorites event
@@ -142,6 +143,17 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       if (state is FavoritesLoaded) {
         emit(state);
       }
+    }
+  }
+
+  /// Handle SearchFavorites event
+  void _onSearchFavorites(
+    SearchFavorites event,
+    Emitter<FavoritesState> emit,
+  ) {
+    if (state is FavoritesLoaded) {
+      final loadedState = state as FavoritesLoaded;
+      emit(loadedState.copyWith(searchQuery: event.query));
     }
   }
 }

@@ -19,10 +19,19 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
     context.read<FavoritesBloc>().add(const LoadFavorites());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -56,39 +65,111 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
         ],
       ),
-      body: BlocBuilder<FavoritesBloc, FavoritesState>(
-        builder: (context, state) {
-          if (state is FavoritesLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      body: Column(
+        children: [
+          // Search bar
+          _buildSearchBar(context),
+          // Favorites list
+          Expanded(
+            child: BlocBuilder<FavoritesBloc, FavoritesState>(
+              builder: (context, state) {
+                if (state is FavoritesLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-          if (state is FavoritesError) {
-            return EmptyState.error(
-              errorMessage: state.message,
-              onRetry: () {
-                context.read<FavoritesBloc>().add(const LoadFavorites());
+                if (state is FavoritesError) {
+                  return EmptyState.error(
+                    errorMessage: state.message,
+                    onRetry: () {
+                      context.read<FavoritesBloc>().add(const LoadFavorites());
+                    },
+                  );
+                }
+
+                if (state is FavoritesLoaded) {
+                  final displayed = state.displayedFavorites;
+
+                  // No favorites at all
+                  if (state.favorites.isEmpty) {
+                    return EmptyState.noFavorites(
+                      onExplore: () {
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  }
+
+                  // Search returned no results
+                  if (displayed.isEmpty && _searchQuery.isNotEmpty) {
+                    return EmptyState.noSearchResults(
+                      query: _searchQuery,
+                      onClear: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    );
+                  }
+
+                  return _buildFavoritesList(context, displayed, state);
+                }
+
+                return const SizedBox.shrink();
               },
-            );
-          }
-
-          if (state is FavoritesLoaded) {
-            if (state.favorites.isEmpty) {
-              return EmptyState.noFavorites(
-                onExplore: () {
-                  Navigator.of(context).pop();
-                },
-              );
-            }
-
-            return _buildFavoritesList(context, state.favorites, state);
-          }
-
-          return const SizedBox.shrink();
-        },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search favorites...',
+          hintStyle: TextStyle(
+            color: AppColors.text.withOpacity(0.5),
+          ),
+          prefixIcon: const Icon(Icons.search_outlined),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged('');
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+        ),
+        onChanged: _onSearchChanged,
+      ),
+    );
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+    context.read<FavoritesBloc>().add(SearchFavorites(query));
   }
 
   Widget _buildFavoritesList(

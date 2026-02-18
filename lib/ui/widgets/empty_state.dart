@@ -41,6 +41,20 @@ class EmptyState extends StatelessWidget {
     );
   }
 
+  /// Empty state for no search results in favorites
+  factory EmptyState.noSearchResults({
+    required String query,
+    VoidCallback? onClear,
+  }) {
+    return EmptyState(
+      icon: 'search_off',
+      title: 'No Matching Favorites',
+      message: 'Could not find any favorites matching "$query". Try a different search term.',
+      actionLabel: 'Clear Search',
+      onAction: onClear,
+    );
+  }
+
   /// Empty state for offline mode
   factory EmptyState.offline({VoidCallback? onRetry}) {
     return EmptyState(

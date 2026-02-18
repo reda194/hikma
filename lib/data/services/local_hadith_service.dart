@@ -91,4 +91,41 @@ class LocalHadithService {
       return null;
     }
   }
+
+  /// Get a random Hadith excluding specific IDs
+  Future<Hadith?> getRandomHadithExcluding({
+    required List<String> excludeIds,
+    HadithCollection? collection,
+  }) async {
+    if (!_isLoaded) {
+      await loadHadiths();
+    }
+
+    if (_cachedHadiths.isEmpty) {
+      return null;
+    }
+
+    List<Hadith> pool = _cachedHadiths;
+
+    // Filter by collection if specified
+    if (collection != null && collection != HadithCollection.all) {
+      pool = pool.where((h) => h.collection == collection).toList();
+
+      if (pool.isEmpty) {
+        // Fallback to all if filter yields no results
+        pool = _cachedHadiths;
+      }
+    }
+
+    // Exclude recently shown IDs
+    pool = pool.where((h) => !excludeIds.contains(h.id)).toList();
+
+    // If all are excluded, return a random one anyway (better than nothing)
+    if (pool.isEmpty) {
+      return await getRandomHadith(collection);
+    }
+
+    pool.shuffle();
+    return pool.first;
+  }
 }

@@ -58,3 +58,13 @@ class IsFavorite extends FavoritesEvent {
 class ClearFavorites extends FavoritesEvent {
   const ClearFavorites();
 }
+
+/// Event to search through favorites
+class SearchFavorites extends FavoritesEvent {
+  final String query;
+
+  const SearchFavorites(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}

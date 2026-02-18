@@ -23,19 +23,23 @@ class FavoritesLoading extends FavoritesState {
 class FavoritesLoaded extends FavoritesState {
   final List<Favorite> favorites;
   final Set<String> favoriteIds;
+  final String searchQuery;
 
   const FavoritesLoaded({
     this.favorites = const [],
     this.favoriteIds = const {},
+    this.searchQuery = '',
   });
 
   FavoritesLoaded copyWith({
     List<Favorite>? favorites,
     Set<String>? favoriteIds,
+    String? searchQuery,
   }) {
     return FavoritesLoaded(
       favorites: favorites ?? this.favorites,
       favoriteIds: favoriteIds ?? this.favoriteIds,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
@@ -43,8 +47,28 @@ class FavoritesLoaded extends FavoritesState {
 
   int get count => favorites.length;
 
+  /// Get favorites filtered by search query
+  List<Favorite> get displayedFavorites {
+    if (searchQuery.isEmpty) {
+      return favorites;
+    }
+
+    final query = searchQuery.toLowerCase();
+    return favorites.where((favorite) {
+      final arabicText = favorite.hadith.arabicText.toLowerCase();
+      final narrator = favorite.hadith.narrator.toLowerCase();
+      final sourceBook = favorite.hadith.sourceBook.toLowerCase();
+      final chapter = favorite.hadith.chapter.toLowerCase();
+
+      return arabicText.contains(query) ||
+          narrator.contains(query) ||
+          sourceBook.contains(query) ||
+          chapter.contains(query);
+    }).toList();
+  }
+
   @override
-  List<Object?> get props => [favorites, favoriteIds];
+  List<Object?> get props => [favorites, favoriteIds, searchQuery];
 }
 
 /// State when an error occurs
