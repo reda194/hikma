@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/hadith.dart';
+import '../../data/models/hadith_collection.dart';
 import '../../data/models/user_settings.dart';
 import '../../bloc/hadith/hadith_bloc.dart';
+import '../../bloc/hadith/hadith_event.dart';
 import '../../bloc/hadith/hadith_state.dart';
 import '../../bloc/favorites/favorites_bloc.dart';
 import '../../bloc/favorites/favorites_state.dart';
@@ -265,7 +267,7 @@ class _PopupContentState extends State<PopupContent> {
                 label: 'Next',
                 onTap: () {
                   context.read<HadithBloc>().add(
-                        const FetchRandomHadith(),
+                        const FetchRandomHadith(collection: HadithCollection.all),
                       );
                 },
               ),

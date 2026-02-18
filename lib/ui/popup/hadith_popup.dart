@@ -69,7 +69,7 @@ class _HadithPopupState extends State<HadithPopup>
     await windowManager.setHasShadow(true);
     await windowManager.setAspectRatio(16 / 10);
     await windowManager.setResizable(true);
-    await windowManager.setWindowTitle('Hikma - Hadith Popup');
+    await windowManager.setTitle('Hikma - Hadith Popup');
 
     // Apply frosted glass effect
     await Window.setEffect(
@@ -253,14 +253,14 @@ class HadithPopupOverlay extends StatelessWidget {
           hadith: hadith,
         );
       },
-      transitionBuilder: (context, animation, secondaryAnimation) {
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
           opacity: animation,
           child: ScaleTransition(
             scale: Tween<double>(begin: 0.9, end: 1.0).animate(
               CurvedAnimation(parent: animation, curve: Curves.easeOut),
             ),
-            child: HadithPopupOverlay(hadith: hadith),
+            child: child,
           ),
         );
       },

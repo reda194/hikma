@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../data/models/user_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
 import 'popup_event.dart';
 import 'popup_state.dart';
@@ -33,7 +34,7 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
     ShowPopup event,
     Emitter<PopupState> emit,
   ) async {
-    PopupPosition position = event.position;
+    PopupPosition? position = event.position;
 
     if (position == null) {
       // Load saved position or use default

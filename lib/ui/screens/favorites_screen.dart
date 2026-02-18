@@ -9,8 +9,6 @@ import '../../bloc/favorites/favorites_event.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/hadith_card.dart';
 import '../widgets/empty_state.dart';
-import '../widgets/bookmark_button.dart';
-import 'about_screen.dart';
 
 /// FavoritesScreen - Display all saved/favorited Hadiths
 class FavoritesScreen extends StatefulWidget {

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../hadith/hadith_bloc.dart';
+import '../hadith/hadith_event.dart';
+import '../../../data/models/hadith_collection.dart';
 import '../../../data/models/user_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
 import 'scheduler_event.dart';
@@ -80,7 +82,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
         }
 
         // Trigger a new Hadith fetch
-        _hadithBloc.add(const FetchRandomHadith());
+        _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
 
         // Schedule next popup
         add(const StartScheduler());
@@ -151,7 +153,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
           ));
         }
 
-        _hadithBloc.add(const FetchRandomHadith());
+        _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
         add(const StartScheduler());
       });
     }

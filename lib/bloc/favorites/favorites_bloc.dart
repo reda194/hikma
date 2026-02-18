@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/models/hadith.dart';
 import '../../../data/repositories/favorites_repository.dart';
 import 'favorites_event.dart';
 import 'favorites_state.dart';

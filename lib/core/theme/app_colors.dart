@@ -9,7 +9,7 @@ class AppColors {
   static const Color primaryLight = Color(0xFF117A65); // Green accent
   static const Color background = Color(0xFFF8F9FA); // Light background
   static const Color text = Color(0xFF2C3E50); // Dark text
-  static const Card surface = Color(0xFFEAF2F8); // Light blue card
+  static const Color surface = Color(0xFFEAF2F8); // Light blue card
 
   // UI colors
   static const Color white = Color(0xFFFFFFFF);
