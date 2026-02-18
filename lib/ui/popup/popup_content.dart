@@ -380,11 +380,11 @@ class _PopupContentState extends State<PopupContent> {
           ElevatedButton.icon(
             onPressed: () {
               context.read<HadithBloc>().add(
-                const FetchRandomHadith(collection: HadithCollection.all),
+                FetchRandomHadith(collection: HadithCollection.all),
               );
             },
             icon: const Icon(Icons.refresh_rounded),
-            label: 'Try Again',
+            label: const Text('Try Again'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.white.withOpacity(0.2),
               foregroundColor: AppColors.white,

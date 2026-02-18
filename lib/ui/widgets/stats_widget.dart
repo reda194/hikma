@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../bloc/hadith/hadith_bloc.dart';
 import '../../bloc/hadith/hadith_state.dart';
 import '../../data/repositories/hadith_repository.dart';
-import '../core/theme/app_colors.dart';
+import '../../core/theme/app_colors.dart';
 
 /// StatsWidget displays reading statistics
 class StatsWidget extends StatefulWidget {
@@ -85,7 +85,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                   Container(
                     width: 1,
                     height: 40,
-                    color: AppColors.divider,
+                    color: AppColors.text.withOpacity(0.1),
                   ),
                   Expanded(
                     child: _StatItem(

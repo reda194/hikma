@@ -9,6 +9,7 @@ import '../../bloc/hadith/hadith_state.dart';
 import '../../bloc/favorites/favorites_bloc.dart';
 import '../../bloc/favorites/favorites_event.dart';
 import '../../data/models/hadith.dart';
+import '../../data/models/hadith_collection.dart';
 import '../../core/theme/app_colors.dart';
 
 /// ContemplationScreen - Full-screen, distraction-free Hadith reading
@@ -56,14 +57,14 @@ class _ContemplationScreenState extends State<ContemplationScreen>
       setState(() => _currentHadith = state.hadith);
     } else {
       context.read<HadithBloc>().add(
-        const FetchRandomHadith(collection: HadithCollection.all),
+        FetchRandomHadith(collection: HadithCollection.all),
       );
     }
   }
 
   void _nextHadith() {
     context.read<HadithBloc>().add(
-      const FetchRandomHadith(collection: HadithCollection.all),
+      FetchRandomHadith(collection: HadithCollection.all),
     );
 
     // Small delay to get the new Hadith from state

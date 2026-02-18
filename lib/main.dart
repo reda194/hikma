@@ -45,13 +45,6 @@ void main() async {
   // Initialize window manager
   await windowManager.ensureInitialized();
 
-  // Set up window close listener to hide instead of quit
-  windowManager.addListener((window, event) {
-    if (event == WindowEvent.close) {
-      windowManager.hide();
-    }
-  });
-
   runApp(const HikmaApp());
 }
 

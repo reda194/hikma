@@ -23,8 +23,8 @@ dependencies:
   # Window Management
   window_manager: ^0.3.0
 
-  # Menu Bar Integration (disabled due to API compatibility)
-  # system_tray: ^2.0.0
+  # Menu Bar Integration
+  system_tray: ^2.0.3
 
   # Frosted Glass Effects
   flutter_acrylic: ^1.1.0
