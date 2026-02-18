@@ -17,21 +17,28 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Dart 3.3+ (Flutter 3.19+)
+**Primary Dependencies**: flutter_bloc, hive_flutter, dio, window_manager, system_tray, flutter_acrylic, google_fonts, connectivity_plus, equatable
+**Storage**: Hive (local key-value) + bundled JSON (Hadith content)
+**Testing**: flutter_test (widget tests), bloc_test (BLoC tests), integration_test
+**Target Platform**: macOS 11+ (Big Sur or later)
+**Project Type**: single (Flutter macOS desktop)
+**Performance Goals**: <50MB memory usage, <2s cold start, 60fps animations
+**Constraints**: <50MB binary size, offline-capable, sandboxed for Mac App Store
+**Scale/Scope**: ~500 bundled Hadiths, ~10 BLoCs, ~20 screens/widgets
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Per `.specify/memory/constitution.md`, all features MUST satisfy:
+
+- [ ] **Simplicity**: Feature justified against core mission? No unnecessary complexity?
+- [ ] **Offline-First**: Does it work without internet? Bundled data sufficient?
+- [ ] **BLoC Architecture**: State in BLoC only? No widget-side business logic?
+- [ ] **macOS Native**: Feels native on macOS? Menu bar integration proper?
+- [ ] **Authentic Content**: Hadith properly cited? Source book and narrator included?
+- [ ] **Privacy**: No user data collection? All stored locally?
 
 ## Project Structure
 
@@ -56,43 +63,34 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
+# Hikma Flutter Project Structure
+lib/
+├── core/              # constants, theme, utils (shared across app)
+│   ├── constants/
+│   ├── theme/
+│   └── utils/
+├── data/              # models, repositories, APIs
 │   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
+│   ├── repositories/
 │   └── services/
-└── tests/
+├── bloc/              # BLoC files per feature
+│   ├── hadith/
+│   ├── scheduler/
+│   ├── favorites/
+│   ├── settings/
+│   └── popup/
+└── ui/                # screens, widgets, popup
+    ├── screens/
+    ├── widgets/
+    └── popup/
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+test/
+├── widget/            # widget tests
+├── bloc/              # BLoC tests
+└── integration/       # integration tests
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Flutter macOS desktop application with enforced BLoC architecture per constitution.
 
 ## Complexity Tracking
 

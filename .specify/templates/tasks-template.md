@@ -20,10 +20,11 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Flutter macOS**: `lib/` for source, `test/` for tests
+- **BLoC files**: `lib/bloc/<feature>/` containing bloc, event, state files
+- **UI files**: `lib/ui/screens/` and `lib/ui/widgets/`
+- **Models**: `lib/data/models/`
+- **Tests**: `test/widget/`, `test/bloc/`, `test/integration/`
 
 <!-- 
   ============================================================================
@@ -62,12 +63,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Setup Hive local storage and initialize boxes
+- [ ] T005 [P] Configure BLoC providers and repository structure
+- [ ] T006 [P] Setup Dio HTTP client with offline fallback logic
+- [ ] T007 Create base Hadith model and related entities
+- [ ] T008 Configure error handling and logging (with privacy in mind)
+- [ ] T009 Setup Noto Naskh Arabic font and RTL text direction
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +84,17 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Widget test for [component] in test/widget/test_[name].dart
+- [ ] T011 [P] [US1] BLoC test for [feature] in test/bloc/test_[name]_bloc.dart
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Create [Entity1] model in lib/data/models/[entity1].dart
+- [ ] T013 [P] [US1] Create [Entity2] model in lib/data/models/[entity2].dart
+- [ ] T014 [US1] Implement [FeatureBloc] in lib/bloc/[feature]/[feature]_bloc.dart (depends on T012, T013)
+- [ ] T015 [US1] Implement [feature] events and states in lib/bloc/[feature]/
+- [ ] T016 [US1] Implement [screen/widget] in lib/ui/screens/[screen].dart
+- [ ] T017 [US1] Add validation and error handling (offline-first)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -107,14 +108,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T018 [P] [US2] Widget test for [component] in test/widget/test_[name].dart
+- [ ] T019 [P] [US2] BLoC test for [feature] in test/bloc/test_[name]_bloc.dart
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create [Entity] model in src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] in src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T020 [P] [US2] Create [Entity] model in lib/data/models/[entity].dart
+- [ ] T021 [US2] Implement [FeatureBloc] in lib/bloc/[feature]/[feature]_bloc.dart
+- [ ] T022 [US2] Implement [screen/widget] in lib/ui/screens/[screen].dart
 - [ ] T023 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
@@ -129,14 +130,14 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US3] Widget test for [component] in test/widget/test_[name].dart
+- [ ] T025 [P] [US3] BLoC test for [feature] in test/bloc/test_[name]_bloc.dart
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Create [Entity] model in src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] in src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
+- [ ] T026 [P] [US3] Create [Entity] model in lib/data/models/[entity].dart
+- [ ] T027 [US3] Implement [FeatureBloc] in lib/bloc/[feature]/[feature]_bloc.dart
+- [ ] T028 [US3] Implement [screen/widget] in lib/ui/screens/[screen].dart
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -248,4 +249,6 @@ With multiple developers:
 - Verify tests fail before implementing
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- Follow BLoC architecture: State changes ONLY through BLoC events
+- All Hadith content MUST be offline-capable (bundled JSON)
+- Privacy: no telemetry, analytics, or cloud sync in implementation
