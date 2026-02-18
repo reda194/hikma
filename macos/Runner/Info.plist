@@ -24,7 +24,8 @@
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>LSUIElement</key>
-	<true/>
+	<!-- Temporarily disabled LSUIElement to see the app window -->
+	<!-- <key>LSUIElement</key>
+	<true/> -->
 </dict>
 </plist>
