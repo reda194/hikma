@@ -1,0 +1,65 @@
+name: hikma
+description: A macOS desktop application that displays authentic Hadith through non-intrusive floating popups.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # BLoC State Management
+  flutter_bloc: ^8.1.0
+  equatable: ^2.0.5
+
+  # Local Storage
+  hive_flutter: ^1.1.0
+
+  # HTTP Client
+  dio: ^5.4.0
+
+  # Window Management
+  window_manager: ^0.3.0
+
+  # Menu Bar Integration
+  system_tray: ^2.0.0
+
+  # Frosted Glass Effects
+  flutter_acrylic: ^1.1.0
+
+  # Fonts
+  google_fonts: ^6.1.0
+
+  # Network Connectivity
+  connectivity_plus: ^5.0.0
+
+  # Audio for notification sounds
+  audioplayers: ^5.2.0
+
+  # Auto-start on login
+  launch_at_login: ^0.1.0
+
+  # Keyboard shortcuts
+  hotkey_manager: ^0.1.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  bloc_test: ^9.1.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/data/
+    - assets/images/
+
+  fonts:
+    - family: NotoNaskhArabic
+      fonts:
+        - asset: assets/fonts/NotoNaskhArabic-Regular.ttf
+        - asset: assets/fonts/NotoNaskhArabic-Bold.ttf
+          weight: 700
