@@ -51,7 +51,9 @@ class SettingsRepository {
       showInDock: showInDock as bool,
       darkModeEnabled: darkMode as bool,
       popupPosition: positionData != null
-          ? PopupPosition.fromJson(positionData as Map<String, dynamic>)
+          ? PopupPosition.fromJson(
+              Map<String, dynamic>.from(positionData as Map),
+            )
           : null,
     );
   }
@@ -117,7 +119,9 @@ class SettingsRepository {
     await init();
     final data = _settingsBox.get(StorageKeys.popupPosition);
     if (data != null) {
-      return PopupPosition.fromJson(data as Map<String, dynamic>);
+      return PopupPosition.fromJson(
+        Map<String, dynamic>.from(data as Map),
+      );
     }
     return null;
   }
