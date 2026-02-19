@@ -253,6 +253,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         emit(state);
         emit(SettingsError('Failed to update dark mode: ${e.toString()}'));
       }
+<<<<<<< HEAD
     }
   }
 
@@ -301,6 +302,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         emit(state);
         emit(SettingsError('Failed to update display duration: ${e.toString()}'));
       }
+=======
+>>>>>>> 8a599ac9c3c1eca8c974aa056302c07a5b1e9ec6
     }
   }
 }
