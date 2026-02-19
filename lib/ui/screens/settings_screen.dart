@@ -6,7 +6,6 @@ import '../../data/models/user_settings.dart';
 import '../../bloc/settings/settings_bloc.dart';
 import '../../bloc/settings/settings_state.dart';
 import '../../bloc/settings/settings_event.dart';
-import '../../bloc/hadith/hadith_bloc.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/stats_widget.dart';
 import 'about_screen.dart';
@@ -26,6 +25,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     context.read<SettingsBloc>().add(const LoadSettings());
   }
 
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: AppColors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +55,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         centerTitle: true,
       ),
-      body: BlocBuilder<SettingsBloc, SettingsState>(
+      body: BlocConsumer<SettingsBloc, SettingsState>(
+        listener: (context, state) {
+          // Show error SnackBar for error states
+          if (state is SettingsError) {
+            _showErrorSnackBar(state.message);
+          }
+        },
         builder: (context, state) {
           if (state is SettingsLoading) {
             return const Center(
@@ -68,6 +91,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   _buildFontSizeTile(settings),
                   _buildDivider(),
+                  _buildSwitchTile(
+                    title: 'Dark Mode',
+                    subtitle: 'Use dark theme',
+                    value: settings.darkModeEnabled,
+                    onChanged: (value) {
+                      context.read<SettingsBloc>().add(ToggleDarkMode(value));
+                    },
+                  ),
                 ],
               ),
 
@@ -259,7 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onChanged: onChanged,
       title: Text(title),
       subtitle: Text(subtitle),
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
     );
   }
 
@@ -304,7 +335,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   },
                   selected: collection == current,
-                  activeColor: AppColors.primary,
+                  fillColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primary;
+                    }
+                    return null;
+                  }),
                 );
               }),
             ],
@@ -350,7 +386,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   },
                   selected: interval == current,
-                  activeColor: AppColors.primary,
+                  fillColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primary;
+                    }
+                    return null;
+                  }),
                 );
               }),
             ],
@@ -399,7 +440,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     }
                   },
                   selected: duration == current,
-                  activeColor: AppColors.primary,
+                  fillColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primary;
+                    }
+                    return null;
+                  }),
                 );
               }),
             ],

@@ -110,7 +110,7 @@ class EmptyState extends StatelessWidget {
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
                 height: 1.6,
               ),
               textAlign: TextAlign.center,
@@ -167,16 +167,16 @@ class EmptyState extends StatelessWidget {
       height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
+          color: AppColors.primary.withValues(alpha: 0.2),
           width: 2,
         ),
       ),
       child: Icon(
         iconData,
         size: 48,
-        color: AppColors.primary.withOpacity(0.6),
+        color: AppColors.primary.withValues(alpha: 0.6),
       ),
     );
   }
@@ -203,7 +203,7 @@ class EmptyStateCompact extends StatelessWidget {
           Icon(
             Icons.inbox_outlined,
             size: 48,
-            color: AppColors.text.withOpacity(0.3),
+            color: AppColors.text.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 12),
           Text(
@@ -211,7 +211,7 @@ class EmptyStateCompact extends StatelessWidget {
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: AppColors.text.withOpacity(0.6),
+              color: AppColors.text.withValues(alpha: 0.6),
             ),
           ),
           if (subtitle != null) ...[
@@ -220,7 +220,7 @@ class EmptyStateCompact extends StatelessWidget {
               subtitle!,
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 14,
-                color: AppColors.text.withOpacity(0.4),
+                color: AppColors.text.withValues(alpha: 0.4),
               ),
             ),
           ],

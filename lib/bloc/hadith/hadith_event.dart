@@ -29,16 +29,6 @@ class FilterByCollection extends HadithEvent {
   List<Object?> get props => [collection];
 }
 
-/// Event to cache a Hadith for offline access
-class CacheHadith extends HadithEvent {
-  final String hadithId;
-
-  const CacheHadith(this.hadithId);
-
-  @override
-  List<Object?> get props => [hadithId];
-}
-
 /// Event to load today's featured Hadith
 class LoadDailyHadith extends HadithEvent {
   const LoadDailyHadith();

@@ -94,11 +94,11 @@ class _BookmarkButtonState extends State<BookmarkButton>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: widget.isFavorite
-                ? filledColor.withOpacity(0.15)
+                ? filledColor.withValues(alpha: 0.15)
                 : AppColors.transparent,
             border: Border.all(
               color: widget.isFavorite
-                  ? filledColor.withOpacity(0.3)
+                  ? filledColor.withValues(alpha: 0.3)
                   : AppColors.transparent,
               width: 1,
             ),
@@ -132,54 +132,6 @@ class _BookmarkButtonState extends State<BookmarkButton>
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Bookmark button variant for use in app bar
-class BookmarkButtonAppBar extends StatelessWidget {
-  final String hadithId;
-  final bool isFavorite;
-  final VoidCallback? onToggle;
-
-  const BookmarkButtonAppBar({
-    super.key,
-    required this.hadithId,
-    required this.isFavorite,
-    this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BookmarkButton(
-      hadithId: hadithId,
-      isFavorite: isFavorite,
-      onToggle: onToggle,
-      size: 28.0,
-    );
-  }
-}
-
-/// Small bookmark button for cards
-class BookmarkButtonSmall extends StatelessWidget {
-  final String hadithId;
-  final bool isFavorite;
-  final VoidCallback? onToggle;
-
-  const BookmarkButtonSmall({
-    super.key,
-    required this.hadithId,
-    required this.isFavorite,
-    this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BookmarkButton(
-      hadithId: hadithId,
-      isFavorite: isFavorite,
-      onToggle: onToggle,
-      size: 20.0,
     );
   }
 }

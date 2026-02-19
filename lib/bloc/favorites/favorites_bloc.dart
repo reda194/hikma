@@ -15,7 +15,6 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     on<AddFavorite>(_onAddFavorite);
     on<RemoveFavorite>(_onRemoveFavorite);
     on<ToggleFavorite>(_onToggleFavorite);
-    on<IsFavorite>(_onIsFavorite);
     on<ClearFavorites>(_onClearFavorites);
     on<SearchFavorites>(_onSearchFavorites);
   }
@@ -57,10 +56,11 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         favoriteIds: favoriteIds,
       ));
     } catch (e) {
-      // Keep current state on error
-      if (state is FavoritesLoaded) {
-        emit(state);
+      // Keep current state on error - don't emit error state to preserve UI
+      if (state is! FavoritesLoaded) {
+        emit(FavoritesError('Failed to add favorite: ${e.toString()}'));
       }
+      // If state is FavoritesLoaded, it remains unchanged
     }
   }
 
@@ -81,10 +81,11 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         favoriteIds: favoriteIds,
       ));
     } catch (e) {
-      // Keep current state on error
-      if (state is FavoritesLoaded) {
-        emit(state);
+      // Keep current state on error - don't emit error state to preserve UI
+      if (state is! FavoritesLoaded) {
+        emit(FavoritesError('Failed to remove favorite: ${e.toString()}'));
       }
+      // If state is FavoritesLoaded, it remains unchanged
     }
   }
 
@@ -94,7 +95,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     Emitter<FavoritesState> emit,
   ) async {
     try {
-      final isFavorited = await _favoritesRepository.toggleFavorite(event.hadith);
+      await _favoritesRepository.toggleFavorite(event.hadith);
 
       // Reload favorites to get updated list
       final favorites = await _favoritesRepository.getAllFavorites();
@@ -105,24 +106,11 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         favoriteIds: favoriteIds,
       ));
     } catch (e) {
-      // Keep current state on error
-      if (state is FavoritesLoaded) {
-        emit(state);
+      // Keep current state on error - don't emit error state to preserve UI
+      if (state is! FavoritesLoaded) {
+        emit(FavoritesError('Failed to toggle favorite: ${e.toString()}'));
       }
-    }
-  }
-
-  /// Handle IsFavorite event (check without modifying state)
-  Future<void> _onIsFavorite(
-    IsFavorite event,
-    Emitter<FavoritesState> emit,
-  ) async {
-    // This event doesn't change state, just queries
-    // The result can be obtained via repository or from current state
-    if (state is FavoritesLoaded) {
-      final loadedState = state as FavoritesLoaded;
-      // No state change needed, query via isFavorite method on state
-      emit(loadedState);
+      // If state is FavoritesLoaded, it remains unchanged
     }
   }
 
@@ -139,10 +127,11 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
         favoriteIds: {},
       ));
     } catch (e) {
-      // Keep current state on error
-      if (state is FavoritesLoaded) {
-        emit(state);
+      // Keep current state on error - don't emit error state to preserve UI
+      if (state is! FavoritesLoaded) {
+        emit(FavoritesError('Failed to clear favorites: ${e.toString()}'));
       }
+      // If state is FavoritesLoaded, it remains unchanged
     }
   }
 

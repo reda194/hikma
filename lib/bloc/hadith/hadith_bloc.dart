@@ -14,7 +14,6 @@ class HadithBloc extends Bloc<HadithEvent, HadithState> {
         super(const HadithInitial()) {
     on<FetchRandomHadith>(_onFetchRandomHadith);
     on<FilterByCollection>(_onFilterByCollection);
-    on<CacheHadith>(_onCacheHadith);
     on<LoadDailyHadith>(_onLoadDailyHadith);
     on<RefreshDailyHadith>(_onRefreshDailyHadith);
     on<IncrementReadCount>(_onIncrementReadCount);
@@ -112,22 +111,6 @@ class HadithBloc extends Bloc<HadithEvent, HadithState> {
       }
     } catch (e) {
       emit(HadithError('Failed to filter Hadiths: ${e.toString()}'));
-    }
-  }
-
-  /// Handle CacheHadith event
-  Future<void> _onCacheHadith(
-    CacheHadith event,
-    Emitter<HadithState> emit,
-  ) async {
-    if (state is HadithLoaded) {
-      try {
-        final currentState = state as HadithLoaded;
-        // The repository handles caching internally
-        emit(currentState);
-      } catch (e) {
-        emit(HadithError('Failed to cache Hadith: ${e.toString()}'));
-      }
     }
   }
 

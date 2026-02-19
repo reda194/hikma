@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -50,7 +49,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
@@ -98,7 +97,7 @@ class _AboutScreenState extends State<AboutScreen> {
               'Wisdom from the Prophetic Traditions',
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 14,
-                color: AppColors.text.withOpacity(0.7),
+                color: AppColors.text.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -111,10 +110,10 @@ class _AboutScreenState extends State<AboutScreen> {
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -231,7 +230,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       'Made with love for the Muslim Ummah',
                       style: GoogleFonts.notoNaskhArabic(
                         fontSize: 13,
-                        color: AppColors.text.withOpacity(0.7),
+                        color: AppColors.text.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -239,7 +238,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       'Data sourced from Sunnah.com API',
                       style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.text.withOpacity(0.5),
+                        color: AppColors.text.withValues(alpha: 0.5),
                       ),
                     ),
                   ],
@@ -254,7 +253,7 @@ class _AboutScreenState extends State<AboutScreen> {
               '© 2025 Hikma. All rights reserved.',
               style: TextStyle(
                 fontSize: 11,
-                color: AppColors.text.withOpacity(0.4),
+                color: AppColors.text.withValues(alpha: 0.4),
               ),
             ),
 
@@ -313,7 +312,7 @@ class _InfoSection extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -340,7 +339,7 @@ class _InfoSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.6,
-                  color: AppColors.text.withOpacity(0.8),
+                  color: AppColors.text.withValues(alpha: 0.8),
                 ),
               ),
             if (child != null) child!,
@@ -394,7 +393,7 @@ class _CollectionItem extends StatelessWidget {
             englishName,
             style: TextStyle(
               fontSize: 12,
-              color: AppColors.text.withOpacity(0.6),
+              color: AppColors.text.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -418,10 +417,10 @@ class _TechChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
+          color: AppColors.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(

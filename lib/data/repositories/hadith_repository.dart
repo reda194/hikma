@@ -196,9 +196,6 @@ class HadithRepository {
     required List<String> excludeIds,
     HadithCollection? collection,
   }) async {
-    // Try to get from API excluding history
-    final collectionValue = collection?.apiValue ?? 'all';
-
     // Try local service with exclusion
     return await _localService.getRandomHadithExcluding(
       excludeIds: excludeIds,

@@ -1,4 +1,3 @@
-import '../../../data/models/user_settings.dart';
 import 'package:equatable/equatable.dart';
 
 /// Base class for all Scheduler states

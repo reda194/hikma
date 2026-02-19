@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:system_tray/system_tray.dart';
 
 import '../../bloc/hadith/hadith_bloc.dart';
 import '../../bloc/hadith/hadith_event.dart';
+import '../../bloc/hadith/hadith_state.dart';
 import '../../bloc/popup/popup_bloc.dart';
 import '../../bloc/popup/popup_event.dart';
 import '../../data/models/hadith_collection.dart';
@@ -29,6 +30,10 @@ class MenuBarManager {
 
   // App window reference for showing/hiding
   WindowListener? _windowListener;
+
+  // Stream subscription to listen for Hadith state changes
+  // Used to wait for Hadith loading before showing popup
+  StreamSubscription<HadithState>? _hadithStateSubscription;
 
   MenuBarManager({
     required HadithBloc hadithBloc,
@@ -167,22 +172,55 @@ class MenuBarManager {
     if (_windowListener != null) {
       windowManager.removeListener(_windowListener!);
     }
+    // Cancel the state subscription to prevent memory leaks
+    await _hadithStateSubscription?.cancel();
+    _hadithStateSubscription = null;
   }
 
   void _showHadith() {
-    _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
-    // Small delay to let Hadith load, then show popup
-    Future.delayed(const Duration(milliseconds: 300), () {
-      _popupBloc.add(const ShowPopup(hadithId: ''));
+    // Cancel any existing subscription to avoid duplicate listeners
+    _hadithStateSubscription?.cancel();
+
+    // Listen for the Hadith to load before showing popup
+    _hadithStateSubscription = _hadithBloc.stream.listen((state) {
+      if (state is HadithLoaded) {
+        // Hadith loaded successfully, show popup now
+        _popupBloc.add(const ShowPopup(hadithId: ''));
+        // Cancel subscription after showing popup
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      } else if (state is HadithError) {
+        // Hadith failed to load, cancel subscription
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      }
     });
+
+    // Fetch the Hadith after setting up the listener
+    _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
   }
 
   void _showDailyHadith() {
-    _hadithBloc.add(const LoadDailyHadith());
-    // Small delay to let Hadith load, then show popup
-    Future.delayed(const Duration(milliseconds: 300), () {
-      _popupBloc.add(const ShowPopup(hadithId: ''));
+    // Cancel any existing subscription to avoid duplicate listeners
+    _hadithStateSubscription?.cancel();
+
+    // Listen for the Hadith to load before showing popup
+    _hadithStateSubscription = _hadithBloc.stream.listen((state) {
+      if (state is HadithLoaded) {
+        // Hadith loaded successfully, show popup now
+        _popupBloc.add(const ShowPopup(hadithId: ''));
+        // Cancel subscription after showing popup
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      } else if (state is HadithError) {
+        // Hadith failed to load, cancel subscription
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      }
     });
+
+    // Load the daily Hadith after setting up the listener
+    _hadithBloc.add(const LoadDailyHadith());
   }
 
   void _showFavorites() {

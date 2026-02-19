@@ -36,3 +36,13 @@ class SettingsLoaded extends SettingsState {
   @override
   List<Object?> get props => [settings];
 }
+
+/// State when an error occurs
+class SettingsError extends SettingsState {
+  final String message;
+
+  const SettingsError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
