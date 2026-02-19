@@ -12,6 +12,8 @@ class UserSettings extends Equatable {
   final bool showInDock;
   final bool darkModeEnabled;
   final PopupPosition? popupPosition;
+  final PopupPositionType popupPositionType;
+  final int popupDisplayDuration;
 
   const UserSettings({
     this.reminderInterval = ReminderInterval.hour1,
@@ -23,6 +25,8 @@ class UserSettings extends Equatable {
     this.showInDock = false,
     this.darkModeEnabled = false,
     this.popupPosition,
+    this.popupPositionType = PopupPositionType.bottomRight,
+    this.popupDisplayDuration = 8,
   });
 
   UserSettings copyWith({
@@ -35,6 +39,8 @@ class UserSettings extends Equatable {
     bool? showInDock,
     bool? darkModeEnabled,
     PopupPosition? popupPosition,
+    PopupPositionType? popupPositionType,
+    int? popupDisplayDuration,
   }) {
     return UserSettings(
       reminderInterval: reminderInterval ?? this.reminderInterval,
@@ -46,6 +52,8 @@ class UserSettings extends Equatable {
       showInDock: showInDock ?? this.showInDock,
       darkModeEnabled: darkModeEnabled ?? this.darkModeEnabled,
       popupPosition: popupPosition ?? this.popupPosition,
+      popupPositionType: popupPositionType ?? this.popupPositionType,
+      popupDisplayDuration: popupDisplayDuration ?? this.popupDisplayDuration,
     );
   }
 
@@ -60,6 +68,8 @@ class UserSettings extends Equatable {
       'showInDock': showInDock,
       'darkModeEnabled': darkModeEnabled,
       if (popupPosition != null) 'popupPosition': popupPosition!.toJson(),
+      'popupPositionType': popupPositionType.index,
+      'popupDisplayDuration': popupDisplayDuration,
     };
   }
 
@@ -86,6 +96,10 @@ class UserSettings extends Equatable {
               json['popupPosition'] as Map<String, dynamic>,
             )
           : null,
+      popupPositionType: PopupPositionType.fromIndex(
+        json['popupPositionType'] as int? ?? 3,
+      ),
+      popupDisplayDuration: json['popupDisplayDuration'] as int? ?? 8,
     );
   }
 
@@ -100,6 +114,8 @@ class UserSettings extends Equatable {
         showInDock,
         darkModeEnabled,
         popupPosition,
+        popupPositionType,
+        popupDisplayDuration,
       ];
 }
 
@@ -264,4 +280,35 @@ class PopupPosition extends Equatable {
 
   @override
   List<Object?> get props => [dx, dy];
+}
+
+/// PopupPositionType enum for screen position selection
+enum PopupPositionType {
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight,
+  center;
+
+  String get displayLabel {
+    switch (this) {
+      case PopupPositionType.topLeft:
+        return 'Top Left';
+      case PopupPositionType.topRight:
+        return 'Top Right';
+      case PopupPositionType.bottomLeft:
+        return 'Bottom Left';
+      case PopupPositionType.bottomRight:
+        return 'Bottom Right';
+      case PopupPositionType.center:
+        return 'Center';
+    }
+  }
+
+  static PopupPositionType fromIndex(int index) {
+    if (index >= 0 && index < values.length) {
+      return values[index];
+    }
+    return bottomRight;
+  }
 }

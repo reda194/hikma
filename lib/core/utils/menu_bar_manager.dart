@@ -185,7 +185,11 @@ class MenuBarManager {
     _hadithStateSubscription = _hadithBloc.stream.listen((state) {
       if (state is HadithLoaded) {
         // Hadith loaded successfully, show popup now
+<<<<<<< HEAD
+        _popupBloc.add(ShowPopup(hadith: state.hadith));
+=======
         _popupBloc.add(const ShowPopup(hadithId: ''));
+>>>>>>> 8a599ac9c3c1eca8c974aa056302c07a5b1e9ec6
         // Cancel subscription after showing popup
         _hadithStateSubscription?.cancel();
         _hadithStateSubscription = null;
@@ -208,7 +212,11 @@ class MenuBarManager {
     _hadithStateSubscription = _hadithBloc.stream.listen((state) {
       if (state is HadithLoaded) {
         // Hadith loaded successfully, show popup now
+<<<<<<< HEAD
+        _popupBloc.add(ShowPopup(hadith: state.hadith));
+=======
         _popupBloc.add(const ShowPopup(hadithId: ''));
+>>>>>>> 8a599ac9c3c1eca8c974aa056302c07a5b1e9ec6
         // Cancel subscription after showing popup
         _hadithStateSubscription?.cancel();
         _hadithStateSubscription = null;

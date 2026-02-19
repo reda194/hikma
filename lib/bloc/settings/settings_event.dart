@@ -104,3 +104,23 @@ class ToggleDarkMode extends SettingsEvent {
   @override
   List<Object?> get props => [enabled];
 }
+
+/// Event to update popup position type
+class UpdatePopupPositionType extends SettingsEvent {
+  final PopupPositionType positionType;
+
+  const UpdatePopupPositionType(this.positionType);
+
+  @override
+  List<Object?> get props => [positionType];
+}
+
+/// Event to update popup display duration (in seconds)
+class UpdatePopupDisplayDuration extends SettingsEvent {
+  final int duration; // Duration in seconds (4-30)
+
+  const UpdatePopupDisplayDuration(this.duration);
+
+  @override
+  List<Object?> get props => [duration];
+}

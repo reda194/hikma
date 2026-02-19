@@ -40,6 +40,8 @@ class SettingsRepository {
         _settingsBox.get(StorageKeys.darkModeEnabled, defaultValue: false);
 
     final positionData = _settingsBox.get(StorageKeys.popupPosition);
+    final positionTypeIndex = _settingsBox.get(StorageKeys.popupPositionType, defaultValue: 3);
+    final displayDuration = _settingsBox.get(StorageKeys.popupDisplayDuration, defaultValue: 8);
 
     return UserSettings(
       reminderInterval: ReminderInterval.fromIndex(intervalIndex as int),
@@ -55,6 +57,8 @@ class SettingsRepository {
               Map<String, dynamic>.from(positionData as Map),
             )
           : null,
+      popupPositionType: PopupPositionType.fromIndex(positionTypeIndex as int),
+      popupDisplayDuration: displayDuration as int,
     );
   }
 
@@ -103,6 +107,16 @@ class SettingsRepository {
     } else {
       await _settingsBox.delete(StorageKeys.popupPosition);
     }
+
+    await _settingsBox.put(
+      StorageKeys.popupPositionType,
+      settings.popupPositionType.index,
+    );
+
+    await _settingsBox.put(
+      StorageKeys.popupDisplayDuration,
+      settings.popupDisplayDuration,
+    );
   }
 
   /// Update popup position
@@ -130,5 +144,44 @@ class SettingsRepository {
   Future<void> clearSettings() async {
     await init();
     await _settingsBox.clear();
+  }
+
+  /// Get popup position type
+  Future<PopupPositionType> getPopupPositionType() async {
+    await init();
+    final index = _settingsBox.get(
+      StorageKeys.popupPositionType,
+      defaultValue: 3, // bottomRight default
+    );
+    return PopupPositionType.fromIndex(index as int);
+  }
+
+  /// Set popup position type
+  Future<void> setPopupPositionType(PopupPositionType positionType) async {
+    await init();
+    await _settingsBox.put(
+      StorageKeys.popupPositionType,
+      positionType.index,
+    );
+  }
+
+  /// Get popup display duration in seconds
+  Future<int> getPopupDisplayDuration() async {
+    await init();
+    return _settingsBox.get(
+      StorageKeys.popupDisplayDuration,
+      defaultValue: 8,
+    ) as int;
+  }
+
+  /// Set popup display duration in seconds
+  Future<void> setPopupDisplayDuration(int seconds) async {
+    await init();
+    // Clamp to valid range 4-30 seconds
+    final clamped = seconds.clamp(4, 30);
+    await _settingsBox.put(
+      StorageKeys.popupDisplayDuration,
+      clamped,
+    );
   }
 }
