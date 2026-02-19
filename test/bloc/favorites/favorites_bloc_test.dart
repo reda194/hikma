@@ -432,7 +432,7 @@ void main() {
       });
 
       test('searches across multiple fields (arabic, narrator, source, chapter)',
-          () {
+          () async {
         // Arrange
         final hadith1 = TestHelpers.createTestHadith(
           id: 'hadith-1',
@@ -451,13 +451,19 @@ void main() {
 
         favoritesBloc.emit(currentState);
 
+        // Assert later - expect state with search results
+        final expected = [
+          isA<FavoritesLoaded>()
+              .having((s) => s.searchQuery, 'searchQuery', 'abu hurairah')
+              .having((s) => s.displayedFavorites.length, 'filtered count', 1)
+              .having((s) => s.displayedFavorites.first.hadith.id, 'first id',
+                  'hadith-1'),
+        ];
+
+        expectLater(favoritesBloc.stream, emitsInOrder(expected));
+
         // Act - search by narrator
         favoritesBloc.add(const SearchFavorites('abu hurairah'));
-
-        // Assert
-        final newState = favoritesBloc.state as FavoritesLoaded;
-        expect(newState.displayedFavorites.length, 1);
-        expect(newState.displayedFavorites.first.hadith.id, 'hadith-1');
       });
     });
 
