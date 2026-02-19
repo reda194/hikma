@@ -8,6 +8,8 @@ import '../../bloc/settings/settings_state.dart';
 import '../../bloc/settings/settings_event.dart';
 import '../../core/theme/app_colors.dart';
 import '../widgets/stats_widget.dart';
+import '../widgets/position_picker.dart';
+import '../widgets/duration_slider.dart';
 import 'about_screen.dart';
 
 /// SettingsScreen - User settings and preferences
@@ -113,6 +115,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildReminderIntervalTile(settings),
                   _buildDivider(),
                   _buildPopupDurationTile(settings),
+                  _buildDivider(),
+                  _buildPopupPositionTile(settings),
+                  _buildDivider(),
+                  _buildPopupDisplayDurationTile(settings),
                 ],
               ),
 
@@ -276,6 +282,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       subtitle: Text(settings.popupDuration.displayLabel),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showPopupDurationPicker(context, settings.popupDuration),
+    );
+  }
+
+  Widget _buildPopupPositionTile(UserSettings settings) {
+    return ListTile(
+      leading: const Icon(Icons.open_with),
+      title: const Text('Popup Position'),
+      subtitle: Text(settings.popupPositionType.displayLabel),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => _showPositionPicker(context, settings.popupPositionType),
+    );
+  }
+
+  Widget _buildPopupDisplayDurationTile(UserSettings settings) {
+    return ListTile(
+      leading: const Icon(Icons.access_time),
+      title: const Text('Display Duration'),
+      subtitle: Text('${settings.popupDisplayDuration} seconds'),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => _showDisplayDurationSlider(context, settings.popupDisplayDuration),
     );
   }
 
@@ -450,6 +476,148 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _showPositionPicker(
+    BuildContext context,
+    PopupPositionType current,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Popup Position',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                PositionPicker(
+                  selected: current,
+                  onChanged: (positionType) {
+                    context.read<SettingsBloc>().add(
+                          UpdatePopupPositionType(positionType),
+                        );
+                    Navigator.of(context).pop();
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Select where the Hadith popup should appear on your screen',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.black.withValues(alpha: 0.5),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDisplayDurationSlider(
+    BuildContext context,
+    int currentDuration,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Display Duration',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    DurationSlider(
+                      duration: currentDuration,
+                      onChanged: (duration) {
+                        setModalState(() {
+                          currentDuration = duration;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<SettingsBloc>().add(
+                              UpdatePopupDisplayDuration(currentDuration),
+                            );
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

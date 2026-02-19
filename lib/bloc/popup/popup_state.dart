@@ -1,4 +1,5 @@
 import '../../../data/models/user_settings.dart';
+import '../../../data/models/hadith.dart';
 import 'package:equatable/equatable.dart';
 
 /// Base class for all Popup states
@@ -19,39 +20,61 @@ class PopupHidden extends PopupState {
   List<Object?> get props => [lastPosition];
 }
 
-/// State when popup is visible
+/// State when popup is visible with full Hadith object
 class PopupVisible extends PopupState {
-  final String hadithId;
-  final PopupPosition position;
-  final int remainingSeconds;
+  final Hadith hadith;
+  final PopupPosition? position;
+  final PopupPositionType positionType;
+  final int remainingMillis; // Remaining time in milliseconds
+  final Duration displayDuration; // Total display duration
+  final bool isHovered;
   final bool isDismissible;
 
   const PopupVisible({
-    required this.hadithId,
-    required this.position,
-    this.remainingSeconds = 0,
+    required this.hadith,
+    this.position,
+    this.positionType = PopupPositionType.bottomRight,
+    this.remainingMillis = 0,
+    this.displayDuration = const Duration(seconds: 8),
+    this.isHovered = false,
     this.isDismissible = true,
   });
 
   PopupVisible copyWith({
-    String? hadithId,
+    Hadith? hadith,
     PopupPosition? position,
-    int? remainingSeconds,
+    PopupPositionType? positionType,
+    int? remainingMillis,
+    Duration? displayDuration,
+    bool? isHovered,
     bool? isDismissible,
   }) {
     return PopupVisible(
-      hadithId: hadithId ?? this.hadithId,
+      hadith: hadith ?? this.hadith,
       position: position ?? this.position,
-      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+      positionType: positionType ?? this.positionType,
+      remainingMillis: remainingMillis ?? this.remainingMillis,
+      displayDuration: displayDuration ?? this.displayDuration,
+      isHovered: isHovered ?? this.isHovered,
       isDismissible: isDismissible ?? this.isDismissible,
     );
   }
 
+  /// Calculate progress (0.0 to 1.0)
+  double get progress {
+    if (displayDuration.inMilliseconds == 0) return 0.0;
+    final elapsed = displayDuration.inMilliseconds - remainingMillis;
+    return (elapsed / displayDuration.inMilliseconds).clamp(0.0, 1.0);
+  }
+
   @override
   List<Object?> get props => [
-        hadithId,
+        hadith,
         position,
-        remainingSeconds,
+        positionType,
+        remainingMillis,
+        displayDuration,
+        isHovered,
         isDismissible,
       ];
 }

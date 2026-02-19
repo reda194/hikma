@@ -83,14 +83,15 @@ class _HikmaAppState extends State<HikmaApp> {
     _favoritesRepository = FavoritesRepository();
     _hadithRepository = HadithRepository();
 
-    // Initialize BLoCs
+    // Initialize BLoCs in correct order (HadithBloc first, as PopupBloc depends on it)
     _settingsBloc = SettingsBloc(settingsRepository: _settingsRepository);
     _favoritesBloc = FavoritesBloc(favoritesRepository: _favoritesRepository);
+    _hadithBloc = HadithBloc(hadithRepository: _hadithRepository);
     _popupBloc = PopupBloc(
       settingsRepository: _settingsRepository,
+      hadithBloc: _hadithBloc,
       audioService: AudioService(),
     );
-    _hadithBloc = HadithBloc(hadithRepository: _hadithRepository);
     _schedulerBloc = SchedulerBloc(
       settingsRepository: _settingsRepository,
       hadithBloc: _hadithBloc,

@@ -17,6 +17,8 @@ class StorageKeys {
   static const String showInDock = 'show_in_dock';
   static const String darkModeEnabled = 'dark_mode_enabled';
   static const String popupPosition = 'popup_position';
+  static const String popupPositionType = 'popup_position_type';
+  static const String popupDisplayDuration = 'popup_display_duration';
 
   // Daily Hadith keys
   static const String dailyHadithId = 'daily_hadith_id';

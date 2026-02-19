@@ -22,6 +22,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleAutoStart>(_onToggleAutoStart);
     on<ToggleShowInDock>(_onToggleShowInDock);
     on<ToggleDarkMode>(_onToggleDarkMode);
+    on<UpdatePopupPositionType>(_onUpdatePopupPositionType);
+    on<UpdatePopupDisplayDuration>(_onUpdatePopupDisplayDuration);
   }
 
   /// Expose repository for external initialization
@@ -250,6 +252,54 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       if (state is SettingsLoaded) {
         emit(state);
         emit(SettingsError('Failed to update dark mode: ${e.toString()}'));
+      }
+    }
+  }
+
+  /// Handle UpdatePopupPositionType event
+  Future<void> _onUpdatePopupPositionType(
+    UpdatePopupPositionType event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state is! SettingsLoaded) return;
+
+    try {
+      final currentState = state as SettingsLoaded;
+      final updatedSettings = currentState.settings.copyWith(
+        popupPositionType: event.positionType,
+      );
+
+      await _settingsRepository.saveSettings(updatedSettings);
+      emit(SettingsLoaded(settings: updatedSettings));
+    } catch (e) {
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update popup position: ${e.toString()}'));
+      }
+    }
+  }
+
+  /// Handle UpdatePopupDisplayDuration event
+  Future<void> _onUpdatePopupDisplayDuration(
+    UpdatePopupDisplayDuration event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state is! SettingsLoaded) return;
+
+    try {
+      final currentState = state as SettingsLoaded;
+      final updatedSettings = currentState.settings.copyWith(
+        popupDisplayDuration: event.duration,
+      );
+
+      await _settingsRepository.saveSettings(updatedSettings);
+      emit(SettingsLoaded(settings: updatedSettings));
+    } catch (e) {
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update display duration: ${e.toString()}'));
       }
     }
   }

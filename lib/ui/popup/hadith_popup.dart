@@ -143,8 +143,8 @@ class _HadithPopupState extends State<HadithPopup>
                       left: _position.dx,
                       top: _position.dy,
                       child: PopupContent(
-                        hadithId: state.hadithId,
-                        remainingSeconds: state.remainingSeconds,
+                        hadith: state.hadith,
+                        remainingSeconds: (state.remainingMillis / 1000).round(),
                         isDismissible: state.isDismissible,
                         onClose: () {
                           context.read<PopupBloc>().add(
