@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -89,73 +91,88 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              if (isDark) const Color(0xFF0A111A) else const Color(0xFFF7FAFC),
-              if (isDark) const Color(0xFF0D1823) else const Color(0xFFF1F6FA),
+              if (isDark) const Color(0xFF09111A) else const Color(0xFFF8FCFF),
+              if (isDark) const Color(0xFF0E1927) else const Color(0xFFEBF5FC),
             ],
           ),
         ),
-        child: Column(
+        child: Stack(
           children: [
-            _buildSearchBar(context),
-            // Favorites list
-            Expanded(
-              child: BlocConsumer<FavoritesBloc, FavoritesState>(
-                listener: (context, state) {
-                  // Show error SnackBar for error states
-                  if (state is FavoritesError) {
-                    _showErrorSnackBar(state.message);
-                  }
-                },
-                builder: (context, state) {
-                  if (state is FavoritesLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  if (state is FavoritesError) {
-                    // Return previous state if available, otherwise show error
-                    if (state is! FavoritesLoaded) {
-                      return EmptyState.error(
-                        errorMessage: state.message,
-                        onRetry: () {
-                          context
-                              .read<FavoritesBloc>()
-                              .add(const LoadFavorites());
-                        },
-                      );
-                    }
-                  }
-
-                  if (state is FavoritesLoaded) {
-                    final displayed = state.displayedFavorites;
-
-                    // No favorites at all
-                    if (state.favorites.isEmpty) {
-                      return EmptyState.noFavorites(
-                        onExplore: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    }
-
-                    // Search returned no results
-                    if (displayed.isEmpty && _searchQuery.isNotEmpty) {
-                      return EmptyState.noSearchResults(
-                        query: _searchQuery,
-                        onClear: () {
-                          _searchController.clear();
-                          _onSearchChanged('');
-                        },
-                      );
-                    }
-
-                    return _buildFavoritesList(context, displayed, state);
-                  }
-
-                  return const SizedBox.shrink();
-                },
+            Positioned(
+              top: -120,
+              left: -70,
+              child: _FavoritesGlow(
+                size: 220,
+                color: scheme.primary.withValues(alpha: isDark ? 0.24 : 0.16),
               ),
+            ),
+            Positioned(
+              bottom: -140,
+              right: -60,
+              child: _FavoritesGlow(
+                size: 240,
+                color: scheme.secondary.withValues(alpha: isDark ? 0.2 : 0.14),
+              ),
+            ),
+            Column(
+              children: [
+                _buildSearchBar(context),
+                Expanded(
+                  child: BlocConsumer<FavoritesBloc, FavoritesState>(
+                    listener: (context, state) {
+                      if (state is FavoritesError) {
+                        _showErrorSnackBar(state.message);
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is FavoritesLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      if (state is FavoritesError) {
+                        if (state is! FavoritesLoaded) {
+                          return EmptyState.error(
+                            errorMessage: state.message,
+                            onRetry: () {
+                              context
+                                  .read<FavoritesBloc>()
+                                  .add(const LoadFavorites());
+                            },
+                          );
+                        }
+                      }
+
+                      if (state is FavoritesLoaded) {
+                        final displayed = state.displayedFavorites;
+
+                        if (state.favorites.isEmpty) {
+                          return EmptyState.noFavorites(
+                            onExplore: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        }
+
+                        if (displayed.isEmpty && _searchQuery.isNotEmpty) {
+                          return EmptyState.noSearchResults(
+                            query: _searchQuery,
+                            onClear: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                          );
+                        }
+
+                        return _buildFavoritesList(context, displayed, state);
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -169,9 +186,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     return Container(
       margin: const EdgeInsets.all(16),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: scheme.surface.withValues(alpha: isDark ? 0.82 : 0.96),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: scheme.onSurface.withValues(alpha: isDark ? 0.14 : 0.1),
         ),
@@ -183,29 +201,32 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
         ],
       ),
-      child: TextField(
-        controller: _searchController,
-        style: Theme.of(context).textTheme.bodyLarge,
-        decoration: InputDecoration(
-          hintText: 'Search favorites...',
-          hintStyle: Theme.of(context).textTheme.bodyMedium,
-          prefixIcon: const Icon(Icons.search_rounded),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    _onSearchChanged('');
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: TextField(
+          controller: _searchController,
+          style: Theme.of(context).textTheme.bodyLarge,
+          decoration: InputDecoration(
+            hintText: 'Search favorites...',
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
+            prefixIcon: const Icon(Icons.search_rounded),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      _onSearchChanged('');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
+          onChanged: _onSearchChanged,
         ),
-        onChanged: _onSearchChanged,
       ),
     );
   }
@@ -275,6 +296,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           },
           child: Card(
             margin: const EdgeInsets.only(bottom: 16),
+            elevation: 0,
+            color:
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.78),
             child: Column(
               children: [
                 // Hadith Card
@@ -459,6 +483,35 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             child: const Text('Remove'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FavoritesGlow extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _FavoritesGlow({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color,
+              color.withValues(alpha: 0.02),
+            ],
+          ),
+        ),
       ),
     );
   }
