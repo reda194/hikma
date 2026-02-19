@@ -7,11 +7,11 @@ class ConnectivityService {
 
   /// Check if device is currently online
   Future<bool> get isOnline async {
-    final results = await _connectivity.checkConnectivity();
+    final dynamic results = await _connectivity.checkConnectivity();
 
     // Handle both single result and list result based on version
-    final List<ConnectivityResult> resultList = results is List
-        ? results as List<ConnectivityResult>
+    final List<ConnectivityResult> resultList = results is List<ConnectivityResult>
+        ? results
         : [results as ConnectivityResult];
 
     // Consider WiFi, Ethernet, VPN, and Bluetooth as online
@@ -27,9 +27,9 @@ class ConnectivityService {
 
   /// Stream of connectivity changes
   Stream<bool> get onConnectivityChanged {
-    return _connectivity.onConnectivityChanged.map((results) {
-      final List<ConnectivityResult> resultList = results is List
-          ? results as List<ConnectivityResult>
+    return _connectivity.onConnectivityChanged.map((dynamic results) {
+      final List<ConnectivityResult> resultList = results is List<ConnectivityResult>
+          ? results
           : [results as ConnectivityResult];
 
       return resultList.any((r) => r != ConnectivityResult.none);

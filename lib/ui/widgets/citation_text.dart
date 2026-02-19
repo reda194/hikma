@@ -26,8 +26,8 @@ class CitationText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isLight ? AppColors.white.withOpacity(0.9) : AppColors.primary;
-    final subtextColor = isLight ? AppColors.white.withOpacity(0.7) : AppColors.text.withOpacity(0.7);
+    final textColor = isLight ? AppColors.white.withValues(alpha: 0.9) : AppColors.primary;
+    final subtextColor = isLight ? AppColors.white.withValues(alpha: 0.7) : AppColors.text.withValues(alpha: 0.7);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -122,13 +122,13 @@ class CitationText extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: isLight
-            ? AppColors.white.withOpacity(0.15)
-            : AppColors.primary.withOpacity(0.1),
+            ? AppColors.white.withValues(alpha: 0.15)
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
           color: isLight
-              ? AppColors.white.withOpacity(0.2)
-              : AppColors.primary.withOpacity(0.2),
+              ? AppColors.white.withValues(alpha: 0.2)
+              : AppColors.primary.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -170,7 +170,7 @@ class CompactCitationText extends StatelessWidget {
       '$source - Book $bookNumber, Hadith $hadithNumber',
       style: TextStyle(
         fontSize: 11,
-        color: AppColors.text.withOpacity(0.6),
+        color: AppColors.text.withValues(alpha: 0.6),
         fontStyle: FontStyle.italic,
       ),
     );

@@ -1,5 +1,3 @@
-import 'package:equatable/equatable.dart';
-
 /// HadithCollection enum representing the six authentic collections (Kutub al-Sittah)
 enum HadithCollection {
   bukhari,

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/hadith.dart';
 import '../../data/models/hadith_collection.dart';
-import '../../data/models/user_settings.dart';
 import '../../bloc/hadith/hadith_bloc.dart';
 import '../../bloc/hadith/hadith_event.dart';
 import '../../bloc/hadith/hadith_state.dart';
@@ -64,8 +63,8 @@ class _PopupContentState extends State<PopupContent> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.primary.withOpacity(0.95),
-              AppColors.primary.withOpacity(0.85),
+              AppColors.primary.withValues(alpha: 0.95),
+              AppColors.primary.withValues(alpha: 0.85),
             ],
           ),
         ),
@@ -80,7 +79,7 @@ class _PopupContentState extends State<PopupContent> {
               child: BlocBuilder<HadithBloc, HadithState>(
                 builder: (context, hadithState) {
                   if (hadithState is HadithError) {
-                    return _buildErrorState(hadithState as HadithError);
+                    return _buildErrorState(hadithState);
                   }
                   if (hadithState is HadithLoading) {
                     return _buildLoadingState();
@@ -123,7 +122,7 @@ class _PopupContentState extends State<PopupContent> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.white.withOpacity(0.2),
+                  color: AppColors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
@@ -176,10 +175,10 @@ class _PopupContentState extends State<PopupContent> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.white.withOpacity(0.15),
+              color: AppColors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: AppColors.white.withOpacity(0.2),
+                color: AppColors.white.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -220,39 +219,6 @@ class _PopupContentState extends State<PopupContent> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.library_books_rounded,
-            color: AppColors.white.withOpacity(0.7),
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No Hadiths available',
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 18,
-              color: AppColors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Please check your data files and restart the app',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.white.withOpacity(0.7),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionBar(BuildContext context) {
     final hadith = _currentHadith ??
         (context.read<HadithBloc>().state is HadithLoaded
@@ -269,10 +235,10 @@ class _PopupContentState extends State<PopupContent> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.white.withOpacity(0.1),
+            color: AppColors.white.withValues(alpha: 0.1),
             border: Border(
               top: BorderSide(
-                color: AppColors.white.withOpacity(0.1),
+                color: AppColors.white.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -326,8 +292,8 @@ class _PopupContentState extends State<PopupContent> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.white.withOpacity(0.8),
-            AppColors.white.withOpacity(0.3),
+            AppColors.white.withValues(alpha: 0.8),
+            AppColors.white.withValues(alpha: 0.3),
           ],
         ),
       ),
@@ -335,7 +301,7 @@ class _PopupContentState extends State<PopupContent> {
         value: seconds / 120.0, // Assuming max 2 minutes for visual
         backgroundColor: AppColors.transparent,
         valueColor: AlwaysStoppedAnimation<Color>(
-          AppColors.white.withOpacity(0.8),
+          AppColors.white.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -356,7 +322,7 @@ class _PopupContentState extends State<PopupContent> {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: AppColors.white.withOpacity(0.7),
+            color: AppColors.white.withValues(alpha: 0.7),
             size: 48,
           ),
           const SizedBox(height: 16),
@@ -373,7 +339,7 @@ class _PopupContentState extends State<PopupContent> {
             'Please check your connection and try again',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.white.withOpacity(0.7),
+              color: AppColors.white.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 24),
@@ -386,7 +352,7 @@ class _PopupContentState extends State<PopupContent> {
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Try Again'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.white.withOpacity(0.2),
+              backgroundColor: AppColors.white.withValues(alpha: 0.2),
               foregroundColor: AppColors.white,
             ),
           ),
@@ -452,7 +418,7 @@ class _ActionButtonState extends State<_ActionButton>
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? AppColors.white.withOpacity(0.2)
+                ? AppColors.white.withValues(alpha: 0.2)
                 : AppColors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
@@ -471,7 +437,7 @@ class _ActionButtonState extends State<_ActionButton>
                 widget.label,
                 style: TextStyle(
                   fontSize: 10,
-                  color: AppColors.white.withOpacity(0.8),
+                  color: AppColors.white.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w500,
                 ),
               ),

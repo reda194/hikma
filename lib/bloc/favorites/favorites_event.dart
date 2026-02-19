@@ -44,16 +44,6 @@ class ToggleFavorite extends FavoritesEvent {
   List<Object?> get props => [hadith];
 }
 
-/// Event to check if a Hadith is favorited
-class IsFavorite extends FavoritesEvent {
-  final String hadithId;
-
-  const IsFavorite(this.hadithId);
-
-  @override
-  List<Object?> get props => [hadithId];
-}
-
 /// Event to clear all favorites
 class ClearFavorites extends FavoritesEvent {
   const ClearFavorites();

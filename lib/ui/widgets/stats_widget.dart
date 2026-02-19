@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../bloc/hadith/hadith_bloc.dart';
-import '../../bloc/hadith/hadith_state.dart';
-import '../../data/repositories/hadith_repository.dart';
 import '../../core/theme/app_colors.dart';
 
 /// StatsWidget displays reading statistics
@@ -29,7 +27,7 @@ class _StatsWidgetState extends State<StatsWidget> {
     setState(() => _isLoading = true);
 
     try {
-      final repository = (context.read<HadithBloc>() as HadithBloc).repository;
+      final repository = context.read<HadithBloc>().repository;
       final today = await repository.getTodayReadCount();
       final week = await repository.getWeekReadCount();
 
@@ -85,7 +83,7 @@ class _StatsWidgetState extends State<StatsWidget> {
                   Container(
                     width: 1,
                     height: 40,
-                    color: AppColors.text.withOpacity(0.1),
+                    color: AppColors.text.withValues(alpha: 0.1),
                   ),
                   Expanded(
                     child: _StatItem(
@@ -120,7 +118,7 @@ class _StatItem extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: AppColors.primary.withOpacity(0.7),
+          color: AppColors.primary.withValues(alpha: 0.7),
           size: 24,
         ),
         const SizedBox(height: 8),
@@ -137,7 +135,7 @@ class _StatItem extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.text.withOpacity(0.6),
+            color: AppColors.text.withValues(alpha: 0.6),
           ),
         ),
       ],

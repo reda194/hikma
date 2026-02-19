@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../hadith/hadith_bloc.dart';
 import '../hadith/hadith_event.dart';
+import '../hadith/hadith_state.dart';
+import '../popup/popup_bloc.dart';
+import '../popup/popup_event.dart';
 import '../../../data/models/hadith_collection.dart';
-import '../../../data/models/user_settings.dart';
 import '../../../data/repositories/settings_repository.dart';
 import 'scheduler_event.dart';
 import 'scheduler_state.dart';
@@ -12,16 +14,20 @@ import 'scheduler_state.dart';
 class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
   final SettingsRepository _settingsRepository;
   final HadithBloc _hadithBloc;
+  final PopupBloc _popupBloc;
 
   Timer? _schedulerTimer;
   Timer? _elapsedTimer;
+  Timer? _popupDelayTimer;
   int _elapsedSeconds = 0;
 
   SchedulerBloc({
     required SettingsRepository settingsRepository,
     required HadithBloc hadithBloc,
+    required PopupBloc popupBloc,
   })  : _settingsRepository = settingsRepository,
         _hadithBloc = hadithBloc,
+        _popupBloc = popupBloc,
         super(const SchedulerInitial()) {
     on<StartScheduler>(_onStartScheduler);
     on<StopScheduler>(_onStopScheduler);
@@ -33,6 +39,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
   Future<void> close() {
     _schedulerTimer?.cancel();
     _elapsedTimer?.cancel();
+    _popupDelayTimer?.cancel();
     return super.close();
   }
 
@@ -83,6 +90,15 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
 
         // Trigger a new Hadith fetch
         _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
+
+        // Wait for Hadith to load, then trigger popup
+        _popupDelayTimer?.cancel();
+        _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
+          final hadithState = _hadithBloc.state;
+          if (hadithState is HadithLoaded) {
+            _popupBloc.add(const ShowPopup(hadithId: ''));
+          }
+        });
 
         // Schedule next popup
         add(const StartScheduler());
@@ -153,7 +169,19 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
           ));
         }
 
+        // Trigger a new Hadith fetch
         _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
+
+        // Wait for Hadith to load, then trigger popup
+        _popupDelayTimer?.cancel();
+        _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
+          final hadithState = _hadithBloc.state;
+          if (hadithState is HadithLoaded) {
+            _popupBloc.add(const ShowPopup(hadithId: ''));
+          }
+        });
+
+        // Schedule next popup
         add(const StartScheduler());
       });
     }
