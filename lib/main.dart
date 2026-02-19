@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -8,7 +10,6 @@ import 'core/constants/storage_keys.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/menu_bar_manager.dart';
 import 'bloc/hadith/hadith_bloc.dart';
-import 'bloc/hadith/hadith_state.dart';
 import 'bloc/scheduler/scheduler_bloc.dart';
 import 'bloc/scheduler/scheduler_event.dart';
 import 'bloc/scheduler/scheduler_state.dart';
@@ -267,9 +268,12 @@ class _HikmaHomeState extends State<HikmaHome> {
       windowButtonVisibility: false,
     );
     await windowManager.setSize(_popupWindowSize);
-    await windowManager.setPosition(
-      Offset(popupState.position.dx, popupState.position.dy),
-    );
+    final popupPosition = popupState.position;
+    if (popupPosition != null) {
+      await windowManager.setPosition(
+        Offset(popupPosition.dx, popupPosition.dy),
+      );
+    }
     await windowManager.show();
     await windowManager.focus();
   }
@@ -319,16 +323,23 @@ class _HikmaHomeState extends State<HikmaHome> {
           bloc: widget.popupBloc,
           listener: (context, popupState) async {
             if (popupState is PopupVisible) {
-              await _enterPopupMode(popupState);
+              if (Platform.isMacOS) {
+                // macOS uses a native floating NSPanel popup; keep app window hidden.
+                await windowManager.hide();
+              } else {
+                await _enterPopupMode(popupState);
+              }
               return;
             }
             if (popupState is PopupHidden) {
-              await _exitPopupMode();
+              if (!Platform.isMacOS) {
+                await _exitPopupMode();
+              }
               await windowManager.hide();
             }
           },
           builder: (context, popupState) {
-            if (popupState is PopupVisible) {
+            if (popupState is PopupVisible && !Platform.isMacOS) {
               return _buildPopupWindow(popupState);
             }
             return _buildHomeWindow();
@@ -473,8 +484,8 @@ class _HikmaHomeState extends State<HikmaHome> {
   }
 
   Widget _buildPopupWindow(PopupVisible popupState) {
-    final hadithState = widget.hadithBloc.state;
-    final hadith = hadithState is HadithLoaded ? hadithState.hadith : null;
+    final hadith = popupState.hadith;
+    final remainingSeconds = (popupState.remainingMillis / 1000).ceil();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -492,16 +503,14 @@ class _HikmaHomeState extends State<HikmaHome> {
             },
             child: SizedBox(
               width: _popupWindowSize.width,
-              child: hadith == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : PopupContent(
-                      hadith: hadith,
-                      remainingSeconds: popupState.remainingSeconds,
-                      isDismissible: popupState.isDismissible,
-                      onClose: () => widget.popupBloc.add(
-                        const DismissPopup(savePosition: true),
-                      ),
-                    ),
+              child: PopupContent(
+                hadith: hadith,
+                remainingSeconds: remainingSeconds,
+                isDismissible: popupState.isDismissible,
+                onClose: () => widget.popupBloc.add(
+                  const DismissPopup(savePosition: true),
+                ),
+              ),
             ),
           ),
         ),

@@ -96,11 +96,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
         _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
           final hadithState = _hadithBloc.state;
           if (hadithState is HadithLoaded) {
-<<<<<<< HEAD
             _popupBloc.add(ShowPopup(hadith: hadithState.hadith));
-=======
-            _popupBloc.add(const ShowPopup(hadithId: ''));
->>>>>>> 8a599ac9c3c1eca8c974aa056302c07a5b1e9ec6
           }
         });
 
@@ -181,11 +177,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
         _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
           final hadithState = _hadithBloc.state;
           if (hadithState is HadithLoaded) {
-<<<<<<< HEAD
             _popupBloc.add(ShowPopup(hadith: hadithState.hadith));
-=======
-            _popupBloc.add(const ShowPopup(hadithId: ''));
->>>>>>> 8a599ac9c3c1eca8c974aa056302c07a5b1e9ec6
           }
         });
 

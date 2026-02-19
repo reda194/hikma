@@ -4,7 +4,8 @@ import FlutterMacOS
 @main
 class AppDelegate: FlutterAppDelegate {
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-    return true
+    // Keep app alive in background after closing window.
+    return false
   }
 
   override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
@@ -12,23 +13,16 @@ class AppDelegate: FlutterAppDelegate {
   }
 
   override func applicationDidFinishLaunching(_ notification: Notification) {
-    // Register popup window plugin
-    PopupWindowPlugin.register(with: registrar as! FlutterPluginRegistrar)
+    super.applicationDidFinishLaunching(notification)
 
-    // Cleanup popup window when app quits
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(applicationWillTerminate),
-      name: NSApplication.willTerminateNotification,
-      object: nil
-    )
+    if let controller = mainFlutterWindow?.contentViewController as? FlutterViewController {
+      let registrar = controller.registrar(forPlugin: "PopupWindowPlugin")
+      PopupWindowPlugin.register(with: registrar)
+    }
   }
 
-  @objc private func applicationWillTerminate() {
+  override func applicationWillTerminate(_ notification: Notification) {
+    super.applicationWillTerminate(notification)
     PopupWindowController.getInstance().dispose()
-  }
-
-  deinit {
-    NotificationCenter.default.removeObserver(self)
   }
 }

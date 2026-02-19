@@ -1,17 +1,14 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/hadith.dart';
-import '../../data/models/user_settings.dart';
 import '../../bloc/popup/popup_bloc.dart';
 import '../../bloc/popup/popup_event.dart';
 import '../../bloc/popup/popup_state.dart';
-import '../../bloc/hadith/hadith_bloc.dart';
-import '../../bloc/hadith/hadith_event.dart';
 import '../../bloc/favorites/favorites_bloc.dart';
-import '../../bloc/favorites/favorites_event.dart';
+import '../../bloc/favorites/favorites_event.dart' as favorites_event;
 import '../../core/theme/app_colors.dart';
 
 /// Native NSPanel popup widget with hover-to-pause and action buttons
@@ -193,9 +190,9 @@ class _NotificationPopupState extends State<NotificationPopup>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.accent,
+            AppColors.primaryLight,
             AppColors.white.withValues(alpha: 0.8),
-            AppColors.accent,
+            AppColors.primaryLight,
           ],
         ),
       ),
@@ -341,7 +338,6 @@ class _NotificationPopupState extends State<NotificationPopup>
       sizeFactor: CurvedAnimation(
         parent: _actionButtonController,
         curve: Curves.easeOut,
-        axisAlignment: -1.0,
       ),
       axis: Axis.vertical,
       axisAlignment: -1.0,
@@ -398,7 +394,7 @@ class _NotificationPopupState extends State<NotificationPopup>
   /// Handle save button tap
   void _handleSave() {
     context.read<FavoritesBloc>().add(
-          ToggleFavorite(widget.hadith),
+          favorites_event.ToggleFavorite(widget.hadith),
         );
   }
 
@@ -455,8 +451,6 @@ class _CircularProgressPainter extends CustomPainter {
     return oldDelegate.progress != progress;
   }
 }
-
-import 'dart:math' as math;
 
 /// Citation badge widget
 class _Badge extends StatelessWidget {

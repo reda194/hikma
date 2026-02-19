@@ -5,7 +5,7 @@ import FlutterMacOS
 class PopupWindowController {
     static var shared: PopupWindowController?
 
-    private var panel: NSPanel?
+    var panel: NSPanel?
     private var flutterViewController: FlutterViewController?
     private var hostingWindow: NSWindow?
     private var autoDismissTimer: Timer?
@@ -401,17 +401,5 @@ struct PopupPositionCalculator {
         )
 
         return CGPoint(x: clampedX, y: clampedY)
-    }
-}
-
-// MARK: - NSResponder (for hover tracking)
-
-extension PopupWindowController {
-    override func mouseEntered(with event: NSEvent) {
-        setHovered(true)
-    }
-
-    override func mouseExited(with event: NSEvent) {
-        setHovered(false)
     }
 }
