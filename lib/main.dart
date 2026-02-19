@@ -19,17 +19,17 @@ import 'bloc/favorites/favorites_bloc.dart';
 import 'bloc/favorites/favorites_event.dart';
 import 'bloc/popup/popup_bloc.dart';
 import 'bloc/popup/popup_state.dart';
+import 'bloc/popup/popup_event.dart';
 import 'data/repositories/hadith_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'data/repositories/favorites_repository.dart';
 import 'data/services/audio_service.dart';
-import 'data/models/hadith.dart';
 import 'ui/screens/settings_screen.dart';
 import 'ui/screens/favorites_screen.dart';
 import 'ui/screens/about_screen.dart';
 import 'ui/screens/contemplation_screen.dart';
 import 'ui/screens/onboarding_screen.dart';
-import 'ui/popup/hadith_popup.dart';
+import 'ui/popup/popup_content.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -107,7 +107,7 @@ class _HikmaAppState extends State<HikmaApp> {
         builder: (context, settingsState) {
           // Determine theme mode based on settings
           final themeMode = settingsState is SettingsLoaded &&
-              settingsState.settings.darkModeEnabled
+                  settingsState.settings.darkModeEnabled
               ? ThemeMode.dark
               : ThemeMode.light;
 
@@ -184,6 +184,8 @@ class _HikmaHomeState extends State<HikmaHome> {
   bool _isInitialized = false;
   bool _repositoriesInitialized = false;
   bool _onboardingCompleted = false;
+  Rect? _normalWindowBounds;
+  static const Size _popupWindowSize = Size(760, 640);
 
   @override
   void initState() {
@@ -238,14 +240,52 @@ class _HikmaHomeState extends State<HikmaHome> {
 
     // Hide from dock initially
     await windowManager.setPreventClose(true);
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.hidden,
+      windowButtonVisibility: true,
+    );
 
     setState(() {
       _isInitialized = true;
     });
   }
 
-  Future<void> _updateDockVisibility(bool showInDock) async {
-    await windowManager.setSkipTaskbar(!showInDock);
+  Future<void> _updateDockVisibility() async {
+    // Always keep the app discoverable from Dock while running in background.
+    await windowManager.setSkipTaskbar(false);
+  }
+
+  Future<void> _enterPopupMode(PopupVisible popupState) async {
+    _normalWindowBounds ??= await windowManager.getBounds();
+
+    await windowManager.setAlwaysOnTop(true);
+    await windowManager.setResizable(false);
+    await windowManager.setMinimumSize(_popupWindowSize);
+    await windowManager.setMaximumSize(_popupWindowSize);
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.hidden,
+      windowButtonVisibility: false,
+    );
+    await windowManager.setSize(_popupWindowSize);
+    await windowManager.setPosition(
+      Offset(popupState.position.dx, popupState.position.dy),
+    );
+    await windowManager.show();
+    await windowManager.focus();
+  }
+
+  Future<void> _exitPopupMode() async {
+    await windowManager.setAlwaysOnTop(false);
+    await windowManager.setResizable(true);
+    await windowManager.setMinimumSize(const Size(600, 420));
+    await windowManager.setMaximumSize(const Size(4096, 4096));
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.hidden,
+      windowButtonVisibility: true,
+    );
+    if (_normalWindowBounds != null) {
+      await windowManager.setBounds(_normalWindowBounds!);
+    }
   }
 
   @override
@@ -264,8 +304,8 @@ class _HikmaHomeState extends State<HikmaHome> {
           // Start scheduler when settings are loaded
           widget.schedulerBloc.add(const StartScheduler());
 
-          // Update dock visibility based on settings
-          _updateDockVisibility(state.settings.showInDock);
+          // Keep Dock icon visible even when the window is hidden.
+          _updateDockVisibility();
         }
       },
       child: BlocListener<SchedulerBloc, SchedulerState>(
@@ -275,69 +315,156 @@ class _HikmaHomeState extends State<HikmaHome> {
             // Scheduler is running
           }
         },
-        child: BlocListener<PopupBloc, PopupState>(
+        child: BlocConsumer<PopupBloc, PopupState>(
           bloc: widget.popupBloc,
-          listener: (context, state) {
-            if (state is PopupVisible) {
-              // Get hadith from HadithBloc state
-              final hadithState = widget.hadithBloc.state;
-              if (hadithState is HadithLoaded) {
-                _showPopup(hadithState.hadith);
-              }
+          listener: (context, popupState) async {
+            if (popupState is PopupVisible) {
+              await _enterPopupMode(popupState);
+              return;
+            }
+            if (popupState is PopupHidden) {
+              await _exitPopupMode();
+              await windowManager.hide();
             }
           },
-          child: Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.nights_stay,
-                    size: 64,
-                    color: const Color(0xFF1B4F72),
+          builder: (context, popupState) {
+            if (popupState is PopupVisible) {
+              return _buildPopupWindow(popupState);
+            }
+            return _buildHomeWindow();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeWindow() {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              if (Theme.of(context).brightness == Brightness.dark)
+                const Color(0xFF081018)
+              else
+                const Color(0xFFF5F9FC),
+              if (Theme.of(context).brightness == Brightness.dark)
+                const Color(0xFF0C1824)
+              else
+                const Color(0xFFEAF2F8),
+              if (Theme.of(context).brightness == Brightness.dark)
+                const Color(0xFF122435)
+              else
+                const Color(0xFFE3EDF6),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 72,
+                  width: 72,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Hikma',
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1B4F72),
-                    ),
+                  child: Icon(
+                    Icons.nights_stay_rounded,
+                    size: 36,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Hadith Reminder for macOS',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: const Color(0xFF7F8C8D),
-                    ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'Hikma',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  const SizedBox(height: 32),
-                  if (!_isInitialized)
-                    const CircularProgressIndicator()
-                  else
-                    Column(
-                      children: [
-                        Text(
-                          'Running in background',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: const Color(0xFF2C3E50),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Daily hadith reflections from your menu bar',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.tajawal(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _isInitialized
+                    ? Container(
+                        width: 520,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .secondary
+                              .withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withValues(alpha: 0.34),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Use the menu bar icon to access features',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: const Color(0xFF95A5A6),
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              size: 18,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Running in background',
+                              style: GoogleFonts.tajawal(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                ],
-              ),
+                      )
+                    : const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: CircularProgressIndicator(),
+                      ),
+                const SizedBox(height: 12),
+                Text(
+                  'Use the menu bar icon to open Favorites, Settings, and Contemplation Mode.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.tajawal(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -345,14 +472,39 @@ class _HikmaHomeState extends State<HikmaHome> {
     );
   }
 
-  void _showPopup(Hadith hadith) {
-    // Navigate to popup overlay
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return HadithPopupOverlay(hadith: hadith);
-        },
-        opaque: false,
+  Widget _buildPopupWindow(PopupVisible popupState) {
+    final hadithState = widget.hadithBloc.state;
+    final hadith = hadithState is HadithLoaded ? hadithState.hadith : null;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Center(
+          child: GestureDetector(
+            onPanStart: (_) async {
+              await windowManager.startDragging();
+            },
+            onPanEnd: (_) async {
+              final position = await windowManager.getPosition();
+              widget.popupBloc.add(
+                UpdatePosition(dx: position.dx, dy: position.dy),
+              );
+            },
+            child: SizedBox(
+              width: _popupWindowSize.width,
+              child: hadith == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : PopupContent(
+                      hadith: hadith,
+                      remainingSeconds: popupState.remainingSeconds,
+                      isDismissible: popupState.isDismissible,
+                      onClose: () => widget.popupBloc.add(
+                        const DismissPopup(savePosition: true),
+                      ),
+                    ),
+            ),
+          ),
+        ),
       ),
     );
   }

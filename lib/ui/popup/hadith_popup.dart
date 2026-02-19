@@ -202,7 +202,7 @@ class HadithPopupOverlay extends StatelessWidget {
     return showGeneralDialog<T>(
       context: context,
       barrierDismissible: true,
-      barrierColor: AppColors.black.withValues(alpha: 0.5),
+      barrierColor: AppColors.black.withValues(alpha: 0.6),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return HadithPopupOverlay(
@@ -236,13 +236,23 @@ class HadithPopupOverlay extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.8,
               constraints: const BoxConstraints(maxWidth: 500, minWidth: 350),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primaryDark.withValues(alpha: 0.96),
+                    AppColors.primary.withValues(alpha: 0.94),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppColors.white.withValues(alpha: 0.18),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
-                    blurRadius: 40,
-                    offset: const Offset(0, 15),
+                    blurRadius: 42,
+                    offset: const Offset(0, 18),
                   ),
                 ],
               ),
