@@ -453,26 +453,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const Divider(),
               ...HadithCollection.values.map((collection) {
-                return RadioListTile<HadithCollection>(
-                  title: Text(collection.displayName),
-                  subtitle: Text(collection.arabicName),
-                  value: collection,
-                  groupValue: current,
-                  onChanged: (value) {
-                    if (value != null) {
-                      context.read<SettingsBloc>().add(
-                            UpdateSourceCollection(value),
-                          );
-                      Navigator.of(context).pop();
-                    }
-                  },
+                return _buildSelectionTile(
+                  title: collection.displayName,
+                  subtitle: collection.arabicName,
                   selected: collection == current,
-                  fillColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.primary;
-                    }
-                    return null;
-                  }),
+                  onTap: () {
+                    context.read<SettingsBloc>().add(
+                          UpdateSourceCollection(collection),
+                        );
+                    Navigator.of(context).pop();
+                  },
                 );
               }),
             ],
@@ -505,25 +495,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const Divider(),
               ...ReminderInterval.values.map((interval) {
-                return RadioListTile<ReminderInterval>(
-                  title: Text(interval.displayLabel),
-                  value: interval,
-                  groupValue: current,
-                  onChanged: (value) {
-                    if (value != null) {
-                      context.read<SettingsBloc>().add(
-                            UpdateReminderInterval(value),
-                          );
-                      Navigator.of(context).pop();
-                    }
-                  },
+                return _buildSelectionTile(
+                  title: interval.displayLabel,
                   selected: interval == current,
-                  fillColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.primary;
-                    }
-                    return null;
-                  }),
+                  onTap: () {
+                    context.read<SettingsBloc>().add(
+                          UpdateReminderInterval(interval),
+                        );
+                    Navigator.of(context).pop();
+                  },
                 );
               }),
             ],
@@ -556,34 +536,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const Divider(),
               ...PopupDuration.values.map((duration) {
-                return RadioListTile<PopupDuration>(
-                  title: Text(duration.displayLabel),
+                return _buildSelectionTile(
+                  title: duration.displayLabel,
                   subtitle: duration == PopupDuration.manual
-                      ? const Text('Popup stays visible until dismissed')
+                      ? 'Popup stays visible until dismissed'
                       : null,
-                  value: duration,
-                  groupValue: current,
-                  onChanged: (value) {
-                    if (value != null) {
-                      context.read<SettingsBloc>().add(
-                            UpdatePopupDuration(value),
-                          );
-                      Navigator.of(context).pop();
-                    }
-                  },
                   selected: duration == current,
-                  fillColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.primary;
-                    }
-                    return null;
-                  }),
+                  onTap: () {
+                    context.read<SettingsBloc>().add(
+                          UpdatePopupDuration(duration),
+                        );
+                    Navigator.of(context).pop();
+                  },
                 );
               }),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSelectionTile({
+    required String title,
+    String? subtitle,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return ListTile(
+      onTap: onTap,
+      title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      trailing: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: selected
+              ? colorScheme.primary.withValues(alpha: 0.18)
+              : Colors.transparent,
+          border: Border.all(
+            color: selected
+                ? colorScheme.primary
+                : colorScheme.onSurface.withValues(alpha: 0.35),
+            width: 1.5,
+          ),
+        ),
+        child: selected
+            ? Icon(
+                Icons.check_rounded,
+                size: 14,
+                color: colorScheme.primary,
+              )
+            : null,
+      ),
     );
   }
 }

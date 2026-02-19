@@ -116,9 +116,9 @@ class _ContemplationScreenState extends State<ContemplationScreen>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryDark,
-                  AppColors.primary,
-                  const Color(0xFF0C2B42),
+                  const Color(0xFF071423),
+                  const Color(0xFF0B2C46),
+                  const Color(0xFF0E3A5A),
                 ],
               ),
             ),
@@ -179,7 +179,7 @@ class _ContemplationScreenState extends State<ContemplationScreen>
                                             ),
                                             decoration: BoxDecoration(
                                               color: AppColors.white
-                                                  .withValues(alpha: 0.1),
+                                                  .withValues(alpha: 0.12),
                                               borderRadius:
                                                   BorderRadius.circular(28),
                                               border: Border.all(
@@ -196,8 +196,8 @@ class _ContemplationScreenState extends State<ContemplationScreen>
                                                     _currentHadith!.arabicText,
                                                     style: GoogleFonts
                                                         .notoNaskhArabic(
-                                                      fontSize: 33,
-                                                      height: 2.25,
+                                                      fontSize: 35,
+                                                      height: 2.2,
                                                       color: AppColors.white,
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -292,9 +292,9 @@ class _ContemplationScreenState extends State<ContemplationScreen>
                 Text(
                   'Contemplation Mode',
                   style: GoogleFonts.tajawal(
-                    fontSize: 14,
+                    fontSize: 15,
                     color: AppColors.white.withValues(alpha: 0.86),
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(width: 48),
@@ -349,11 +349,18 @@ class _ActionButton extends StatelessWidget {
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.16),
+            color: AppColors.white.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.24),
+              color: AppColors.white.withValues(alpha: 0.28),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.16),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
