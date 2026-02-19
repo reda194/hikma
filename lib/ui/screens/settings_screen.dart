@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,124 +82,131 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           final settings = state.settings;
 
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  if (isDark)
-                    const Color(0xFF0A111A)
-                  else
-                    const Color(0xFFF7FAFC),
-                  if (isDark)
-                    const Color(0xFF0D1823)
-                  else
-                    const Color(0xFFF1F6FA),
-                  if (isDark)
-                    const Color(0xFF132334).withValues(alpha: 0.6)
-                  else
-                    const Color(0xFFE8F2F8).withValues(alpha: 0.6),
+          return Stack(
+            children: [
+              Positioned(
+                top: -120,
+                right: -60,
+                child: _GlowBubble(
+                  size: 260,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: isDark ? 0.28 : 0.18),
+                ),
+              ),
+              Positioned(
+                bottom: -140,
+                left: -70,
+                child: _GlowBubble(
+                  size: 240,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .secondary
+                      .withValues(alpha: isDark ? 0.24 : 0.16),
+                ),
+              ),
+              ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildHeaderCard(settings),
+                  const SizedBox(height: 16),
+                  const StatsWidget(),
+                  const SizedBox(height: 18),
+                  _buildSectionHeader(
+                      context, 'Display', Icons.palette_outlined),
+                  _buildCard(
+                    children: [
+                      _buildFontSizeTile(settings),
+                      _buildDivider(),
+                      _buildSwitchTile(
+                        title: 'Dark Mode',
+                        subtitle: 'Use dark theme',
+                        value: settings.darkModeEnabled,
+                        onChanged: (value) {
+                          context
+                              .read<SettingsBloc>()
+                              .add(ToggleDarkMode(value));
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionHeader(
+                      context, 'Hadith', Icons.menu_book_outlined),
+                  _buildCard(
+                    children: [
+                      _buildCollectionTile(settings),
+                      _buildDivider(),
+                      _buildReminderIntervalTile(settings),
+                      _buildDivider(),
+                      _buildPopupDurationTile(settings),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionHeader(
+                    context,
+                    'Notifications',
+                    Icons.notifications_outlined,
+                  ),
+                  _buildCard(
+                    children: [
+                      _buildSwitchTile(
+                        title: 'Notification Sound',
+                        subtitle: 'Play sound when Hadith popup appears',
+                        value: settings.soundEnabled,
+                        onChanged: (value) {
+                          context.read<SettingsBloc>().add(ToggleSound(value));
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSectionHeader(
+                      context, 'Application', Icons.apps_outlined),
+                  _buildCard(
+                    children: [
+                      _buildSwitchTile(
+                        title: 'Auto-start at Login',
+                        subtitle: 'Launch Hikma automatically when you log in',
+                        value: settings.autoStartEnabled,
+                        onChanged: (value) {
+                          context
+                              .read<SettingsBloc>()
+                              .add(ToggleAutoStart(value));
+                        },
+                      ),
+                      _buildDivider(),
+                      _buildSwitchTile(
+                        title: 'Show in Dock',
+                        subtitle: 'Display Hikma icon in macOS Dock',
+                        value: settings.showInDock,
+                        onChanged: (value) {
+                          context
+                              .read<SettingsBloc>()
+                              .add(ToggleShowInDock(value));
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  Center(
+                    child: FilledButton.tonalIcon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AboutScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.info_outline_rounded),
+                      label: const Text('About Hikma'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
-            ),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildHeaderCard(settings),
-                const SizedBox(height: 16),
-                const StatsWidget(),
-                const SizedBox(height: 18),
-                _buildSectionHeader(context, 'Display', Icons.palette_outlined),
-                _buildCard(
-                  children: [
-                    _buildFontSizeTile(settings),
-                    _buildDivider(),
-                    _buildSwitchTile(
-                      title: 'Dark Mode',
-                      subtitle: 'Use dark theme',
-                      value: settings.darkModeEnabled,
-                      onChanged: (value) {
-                        context.read<SettingsBloc>().add(ToggleDarkMode(value));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildSectionHeader(
-                    context, 'Hadith', Icons.menu_book_outlined),
-                _buildCard(
-                  children: [
-                    _buildCollectionTile(settings),
-                    _buildDivider(),
-                    _buildReminderIntervalTile(settings),
-                    _buildDivider(),
-                    _buildPopupDurationTile(settings),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildSectionHeader(
-                  context,
-                  'Notifications',
-                  Icons.notifications_outlined,
-                ),
-                _buildCard(
-                  children: [
-                    _buildSwitchTile(
-                      title: 'Notification Sound',
-                      subtitle: 'Play sound when Hadith popup appears',
-                      value: settings.soundEnabled,
-                      onChanged: (value) {
-                        context.read<SettingsBloc>().add(ToggleSound(value));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildSectionHeader(
-                    context, 'Application', Icons.apps_outlined),
-                _buildCard(
-                  children: [
-                    _buildSwitchTile(
-                      title: 'Auto-start at Login',
-                      subtitle: 'Launch Hikma automatically when you log in',
-                      value: settings.autoStartEnabled,
-                      onChanged: (value) {
-                        context
-                            .read<SettingsBloc>()
-                            .add(ToggleAutoStart(value));
-                      },
-                    ),
-                    _buildDivider(),
-                    _buildSwitchTile(
-                      title: 'Show in Dock',
-                      subtitle: 'Display Hikma icon in macOS Dock',
-                      value: settings.showInDock,
-                      onChanged: (value) {
-                        context
-                            .read<SettingsBloc>()
-                            .add(ToggleShowInDock(value));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 28),
-                Center(
-                  child: FilledButton.tonalIcon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const AboutScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.info_outline_rounded),
-                    label: const Text('About Hikma'),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
+            ],
           );
         },
       ),
@@ -303,18 +312,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final scheme = Theme.of(context).colorScheme;
 
     return Card(
-      elevation: isDark ? 0 : 1,
+      clipBehavior: Clip.antiAlias,
+      elevation: isDark ? 0 : 0.8,
       shadowColor: AppColors.shadow,
-      color: scheme.surface.withValues(alpha: isDark ? 0.82 : 0.96),
+      color: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         side: BorderSide(
           color: (isDark ? scheme.onSurface : AppColors.border).withValues(
             alpha: isDark ? 0.16 : 1,
           ),
         ),
       ),
-      child: Column(children: children),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: scheme.surface.withValues(alpha: isDark ? 0.68 : 0.78),
+          ),
+          child: Column(children: children),
+        ),
+      ),
     );
   }
 
@@ -566,6 +584,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _GlowBubble extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _GlowBubble({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color,
+              color.withValues(alpha: 0.03),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

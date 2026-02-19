@@ -24,10 +24,32 @@ jobs:
         run: flutter pub get
 
       - name: Static analysis
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: flutter analyze --fatal-warnings --no-fatal-infos
 
       - name: Unit tests
         run: flutter test --reporter expanded
+
+  lint_strict_advisory:
+    name: Strict Lint (Advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Strict analysis report
+        run: flutter analyze
 
   macos_build:
     name: macOS Build

@@ -1,4 +1,3 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hikma/bloc/hadith/hadith_bloc.dart';
 import 'package:hikma/bloc/hadith/hadith_event.dart';
@@ -112,7 +111,6 @@ void main() {
 
       test('uses exclusion list to avoid recently shown Hadiths', () async {
         // Arrange
-        final history = ['test-hadith-1', 'test-hadith-2'];
         final newHadith = TestHelpers.createTestHadith(id: 'test-hadith-3');
 
         when(() => mockHadithRepository.getRandomHadithExcluding(
@@ -143,8 +141,7 @@ void main() {
             )).called(1);
       });
 
-      test('falls back to regular fetch when exclusion returns null',
-          () async {
+      test('falls back to regular fetch when exclusion returns null', () async {
         // Arrange
         when(() => mockHadithRepository.getRandomHadithExcluding(
               excludeIds: any(named: 'excludeIds'),
@@ -187,7 +184,8 @@ void main() {
           const HadithLoading(),
           isA<HadithLoaded>()
               .having((s) => s.hadith.id, 'hadith.id', 'test-hadith-1')
-              .having((s) => s.dailyHadith?.id, 'dailyHadith.id', 'test-hadith-1'),
+              .having(
+                  (s) => s.dailyHadith?.id, 'dailyHadith.id', 'test-hadith-1'),
         ];
 
         expectLater(hadithBloc.stream, emitsInOrder(expected));
@@ -266,8 +264,7 @@ void main() {
         hadithBloc.add(const RefreshDailyHadith());
       });
 
-      test('emits [HadithLoading, HadithError] when refresh fails',
-          () async {
+      test('emits [HadithLoading, HadithError] when refresh fails', () async {
         // Arrange
         when(() => mockHadithRepository.refreshDailyHadith())
             .thenAnswer((_) async => null);

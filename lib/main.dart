@@ -350,6 +350,9 @@ class _HikmaHomeState extends State<HikmaHome> {
   }
 
   Widget _buildHomeWindow() {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -357,127 +360,157 @@ class _HikmaHomeState extends State<HikmaHome> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              if (Theme.of(context).brightness == Brightness.dark)
-                const Color(0xFF081018)
-              else
-                const Color(0xFFF5F9FC),
-              if (Theme.of(context).brightness == Brightness.dark)
-                const Color(0xFF0C1824)
-              else
-                const Color(0xFFEAF2F8),
-              if (Theme.of(context).brightness == Brightness.dark)
-                const Color(0xFF122435)
-              else
-                const Color(0xFFE3EDF6),
+              if (isDark) const Color(0xFF07101A) else const Color(0xFFF7FCFF),
+              if (isDark) const Color(0xFF0B1724) else const Color(0xFFEDF6FD),
+              if (isDark) const Color(0xFF0F2233) else const Color(0xFFE3F0FA),
             ],
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 72,
-                  width: 72,
+        child: Stack(
+          children: [
+            Positioned(
+              top: -140,
+              right: -120,
+              child: _AmbientOrb(
+                size: 320,
+                color: scheme.primary.withValues(alpha: isDark ? 0.22 : 0.18),
+              ),
+            ),
+            Positioned(
+              bottom: -170,
+              left: -110,
+              child: _AmbientOrb(
+                size: 300,
+                color: scheme.secondary.withValues(alpha: isDark ? 0.2 : 0.16),
+              ),
+            ),
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 28),
+                  padding: const EdgeInsets.fromLTRB(34, 36, 34, 30),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(36),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        scheme.surface.withValues(alpha: isDark ? 0.32 : 0.84),
+                        scheme.surface.withValues(alpha: isDark ? 0.18 : 0.58),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: scheme.onSurface
+                          .withValues(alpha: isDark ? 0.2 : 0.12),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.24 : 0.08),
+                        blurRadius: 40,
+                        offset: const Offset(0, 24),
+                      ),
+                    ],
                   ),
-                  child: Icon(
-                    Icons.nights_stay_rounded,
-                    size: 36,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Hikma',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 38,
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Daily hadith reflections from your menu bar',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.tajawal(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.72),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _isInitialized
-                    ? Container(
-                        width: 520,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 86,
+                        width: 86,
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondary
-                              .withValues(alpha: 0.16),
-                          borderRadius: BorderRadius.circular(14),
+                          color: scheme.primary
+                              .withValues(alpha: isDark ? 0.26 : 0.15),
+                          borderRadius: BorderRadius.circular(28),
                           border: Border.all(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .secondary
-                                .withValues(alpha: 0.34),
+                            color: scheme.primary.withValues(alpha: 0.35),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.check_circle_rounded,
-                              size: 18,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Running in background',
-                              style: GoogleFonts.tajawal(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
-                          ],
+                        child: Icon(
+                          Icons.auto_stories_rounded,
+                          size: 42,
+                          color: scheme.primary,
                         ),
-                      )
-                    : const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: CircularProgressIndicator(),
                       ),
-                const SizedBox(height: 12),
-                Text(
-                  'Use the menu bar icon to open Favorites, Settings, and Contemplation Mode.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.tajawal(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                    height: 1.4,
+                      const SizedBox(height: 18),
+                      Text(
+                        'Hikma',
+                        style: GoogleFonts.cormorantGaramond(
+                          fontSize: 56,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onSurface,
+                          height: 0.95,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Liquid wisdom panel for timeless daily hadith reflection',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.tajawal(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.2,
+                          color: scheme.onSurface.withValues(alpha: 0.72),
+                        ),
+                      ),
+                      const SizedBox(height: 26),
+                      _isInitialized
+                          ? Container(
+                              width: 560,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: scheme.secondary.withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color:
+                                      scheme.secondary.withValues(alpha: 0.38),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_rounded,
+                                    size: 20,
+                                    color: scheme.secondary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Running in background via menu bar and dock',
+                                    style: GoogleFonts.tajawal(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: scheme.secondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: CircularProgressIndicator(),
+                            ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Close the window anytime. Hikma stays alive in the background and is always reachable from the menu bar and Dock.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.tajawal(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w500,
+                          color: scheme.onSurface.withValues(alpha: 0.68),
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -512,6 +545,35 @@ class _HikmaHomeState extends State<HikmaHome> {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AmbientOrb extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _AmbientOrb({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color,
+              color.withValues(alpha: 0.02),
+            ],
           ),
         ),
       ),

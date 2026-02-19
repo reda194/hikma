@@ -102,7 +102,7 @@ class PopupWindowManager {
     try {
       final result = await _channel.invokeMethod('getPopupPosition');
       if (result != null && result is Map<String, dynamic>) {
-        return PopupPosition.fromJson(result as Map<String, dynamic>);
+        return PopupPosition.fromJson(result);
       }
       return null;
     } catch (e) {

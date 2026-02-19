@@ -1,9 +1,7 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hikma/bloc/favorites/favorites_bloc.dart';
 import 'package:hikma/bloc/favorites/favorites_event.dart';
 import 'package:hikma/bloc/favorites/favorites_state.dart';
-import 'package:hikma/data/models/favorite.dart';
 import 'package:hikma/data/models/hadith.dart';
 import 'package:hikma/data/models/hadith_collection.dart';
 import 'package:mocktail/mocktail.dart';
@@ -106,7 +104,8 @@ void main() {
         favoritesBloc.add(const LoadFavorites());
       });
 
-      test('emits [FavoritesLoading, FavoritesLoaded] with empty list when no favorites',
+      test(
+          'emits [FavoritesLoading, FavoritesLoaded] with empty list when no favorites',
           () async {
         // Arrange
         when(() => mockFavoritesRepository.getAllFavorites())
@@ -150,8 +149,7 @@ void main() {
     });
 
     group('ToggleFavorite', () {
-      test('adds Hadith to favorites when not previously favorited',
-          () async {
+      test('adds Hadith to favorites when not previously favorited', () async {
         // Arrange
         final updatedFavorites = [
           TestHelpers.createTestFavorite(hadith: testHadith),
@@ -177,8 +175,7 @@ void main() {
         favoritesBloc.add(ToggleFavorite(testHadith));
       });
 
-      test('removes Hadith from favorites when previously favorited',
-          () async {
+      test('removes Hadith from favorites when previously favorited', () async {
         // Arrange
         when(() => mockFavoritesRepository.toggleFavorite(any()))
             .thenAnswer((_) async => false);
@@ -431,7 +428,8 @@ void main() {
         favoritesBloc.add(const SearchFavorites(''));
       });
 
-      test('searches across multiple fields (arabic, narrator, source, chapter)',
+      test(
+          'searches across multiple fields (arabic, narrator, source, chapter)',
           () {
         // Arrange
         final hadith1 = TestHelpers.createTestHadith(

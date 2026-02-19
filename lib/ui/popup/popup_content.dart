@@ -63,10 +63,13 @@ class _PopupContentState extends State<PopupContent> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.primaryDark.withValues(alpha: 0.95),
-              AppColors.primary.withValues(alpha: 0.9),
-              const Color(0xFF0D2D44).withValues(alpha: 0.95),
+              const Color(0xFF0B2437).withValues(alpha: 0.96),
+              const Color(0xFF12405E).withValues(alpha: 0.9),
+              const Color(0xFF0E2D46).withValues(alpha: 0.94),
             ],
+          ),
+          border: Border.all(
+            color: AppColors.white.withValues(alpha: 0.14),
           ),
         ),
         child: Column(
@@ -135,8 +138,8 @@ class _PopupContentState extends State<PopupContent> {
               const SizedBox(width: 8),
               Text(
                 'Hikma',
-                style: GoogleFonts.tajawal(
-                  fontSize: 16,
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 28,
                   fontWeight: FontWeight.w700,
                   color: AppColors.white,
                 ),
@@ -236,7 +239,7 @@ class _PopupContentState extends State<PopupContent> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.1),
+            color: AppColors.white.withValues(alpha: 0.09),
             border: Border(
               top: BorderSide(
                 color: AppColors.white.withValues(alpha: 0.1),

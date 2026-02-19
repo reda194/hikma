@@ -3,7 +3,6 @@ import 'package:hive/hive.dart';
 import 'package:hikma/data/models/hadith.dart';
 import 'package:hikma/data/models/hadith_collection.dart';
 import 'package:hikma/data/models/favorite.dart';
-import 'package:hikma/data/models/read_statistics.dart';
 import 'package:hikma/data/repositories/hadith_repository.dart';
 import 'package:hikma/data/repositories/favorites_repository.dart';
 

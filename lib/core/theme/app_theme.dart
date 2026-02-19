@@ -8,13 +8,13 @@ class AppTheme {
 
   static TextTheme _textTheme(Color text, Color muted, Color onPrimary) {
     return TextTheme(
-      displayLarge: GoogleFonts.notoNaskhArabic(
-        fontSize: 34,
+      displayLarge: GoogleFonts.cormorantGaramond(
+        fontSize: 42,
         fontWeight: FontWeight.w700,
         color: text,
       ),
-      displayMedium: GoogleFonts.notoNaskhArabic(
-        fontSize: 30,
+      displayMedium: GoogleFonts.cormorantGaramond(
+        fontSize: 34,
         fontWeight: FontWeight.w700,
         color: text,
       ),
@@ -29,12 +29,12 @@ class AppTheme {
         color: text,
       ),
       titleLarge: GoogleFonts.tajawal(
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: FontWeight.w700,
         color: text,
       ),
       titleMedium: GoogleFonts.tajawal(
-        fontSize: 16,
+        fontSize: 17,
         fontWeight: FontWeight.w600,
         color: text,
       ),
@@ -77,10 +77,10 @@ class AppTheme {
       dividerColor: cardBorder,
       cardTheme: CardThemeData(
         color: colorScheme.surface,
-        elevation: brightness == Brightness.light ? 1 : 0,
+        elevation: brightness == Brightness.light ? 0.6 : 0,
         shadowColor: AppColors.shadow,
         shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(18)),
+          borderRadius: const BorderRadius.all(Radius.circular(24)),
           side: BorderSide(color: cardBorder, width: 1),
         ),
       ),
@@ -93,7 +93,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colorScheme.surface,
+        fillColor: colorScheme.surface.withValues(alpha: 0.84),
         hintStyle: textTheme.bodyMedium,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -131,6 +131,11 @@ class AppTheme {
             return colorScheme.surface.withValues(alpha: 0.8);
           }),
           side: WidgetStatePropertyAll(BorderSide(color: cardBorder)),
+          shape: const WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(14)),
+            ),
+          ),
         ),
       ),
       switchTheme: SwitchThemeData(
@@ -147,17 +152,31 @@ class AppTheme {
           return muted.withValues(alpha: 0.35);
         }),
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          padding: const WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          ),
+          shape: const WidgetStatePropertyAll(
+            StadiumBorder(),
+          ),
+          backgroundColor: WidgetStatePropertyAll(
+            colorScheme.primary.withValues(alpha: 0.92),
+          ),
+          foregroundColor: WidgetStatePropertyAll(colorScheme.onPrimary),
+        ),
+      ),
     );
   }
 
   static ThemeData get lightTheme {
     const colorScheme = ColorScheme.light(
-      primary: AppColors.primary,
+      primary: Color(0xFF0F4D73),
       onPrimary: AppColors.white,
-      secondary: AppColors.primaryLight,
+      secondary: Color(0xFF2AB7A8),
       onSecondary: AppColors.white,
-      surface: AppColors.surfaceElevated,
-      onSurface: AppColors.text,
+      surface: Color(0xFFFCFEFF),
+      onSurface: Color(0xFF0E2A3E),
       error: AppColors.error,
       onError: AppColors.white,
     );
@@ -166,19 +185,19 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackground: AppColors.background,
-      appBarBackground: AppColors.backgroundSoft,
-      cardBorder: AppColors.border,
+      appBarBackground: const Color(0xFFEFF6FB),
+      cardBorder: const Color(0xFFCFDCE8),
     );
   }
 
   static ThemeData get darkTheme {
     const colorScheme = ColorScheme.dark(
-      primary: Color(0xFF69B3E8),
-      onPrimary: Color(0xFF082033),
-      secondary: Color(0xFF58D3B6),
-      onSecondary: Color(0xFF032B23),
-      surface: Color(0xFF111A24),
-      onSurface: Color(0xFFE6EEF8),
+      primary: Color(0xFF6EC5FF),
+      onPrimary: Color(0xFF04243A),
+      secondary: Color(0xFF5CE4D1),
+      onSecondary: Color(0xFF022821),
+      surface: Color(0xFF121D29),
+      onSurface: Color(0xFFE8F2FC),
       error: Color(0xFFF06B6B),
       onError: Color(0xFF290304),
     );
