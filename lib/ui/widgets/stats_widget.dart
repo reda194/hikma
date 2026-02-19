@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../bloc/hadith/hadith_bloc.dart';
-import '../../core/theme/app_colors.dart';
 
 /// StatsWidget displays reading statistics
 class StatsWidget extends StatefulWidget {
@@ -47,19 +45,21 @@ class _StatsWidgetState extends State<StatsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Reading Statistics',
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+              style: textTheme.titleMedium?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.95),
               ),
             ),
             const SizedBox(height: 16),
@@ -83,7 +83,8 @@ class _StatsWidgetState extends State<StatsWidget> {
                   Container(
                     width: 1,
                     height: 40,
-                    color: AppColors.text.withValues(alpha: 0.1),
+                    color:
+                        scheme.onSurface.withValues(alpha: isDark ? 0.2 : 0.12),
                   ),
                   Expanded(
                     child: _StatItem(
@@ -114,28 +115,30 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       children: [
         Icon(
           icon,
-          color: AppColors.primary.withValues(alpha: 0.7),
+          color: scheme.primary,
           size: 24,
         ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.text,
+          style: textTheme.displaySmall?.copyWith(
+            fontSize: 38,
+            color: scheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(
+          style: textTheme.bodyMedium?.copyWith(
             fontSize: 12,
-            color: AppColors.text.withValues(alpha: 0.6),
+            color: scheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],

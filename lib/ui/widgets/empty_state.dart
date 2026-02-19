@@ -24,7 +24,8 @@ class EmptyState extends StatelessWidget {
     return EmptyState(
       icon: 'bookmark_border',
       title: 'No Favorites Yet',
-      message: 'Start saving Hadiths you love by tapping the bookmark icon on any Hadith card.',
+      message:
+          'Start saving Hadiths you love by tapping the bookmark icon on any Hadith card.',
       actionLabel: 'Explore Hadiths',
       onAction: onExplore,
     );
@@ -49,7 +50,8 @@ class EmptyState extends StatelessWidget {
     return EmptyState(
       icon: 'search_off',
       title: 'No Matching Favorites',
-      message: 'Could not find any favorites matching "$query". Try a different search term.',
+      message:
+          'Could not find any favorites matching "$query". Try a different search term.',
       actionLabel: 'Clear Search',
       onAction: onClear,
     );
@@ -60,7 +62,8 @@ class EmptyState extends StatelessWidget {
     return EmptyState(
       icon: 'cloud_off',
       title: 'Offline Mode',
-      message: 'No cached Hadiths available. Connect to the internet to load more content.',
+      message:
+          'No cached Hadiths available. Connect to the internet to load more content.',
       actionLabel: 'Retry',
       onAction: onRetry,
     );
@@ -84,58 +87,67 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon with animated fade-in
-            _buildIcon(context),
-            const SizedBox(height: 24),
-
-            // Title
-            Text(
-              title,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: AppColors.text,
+        padding: const EdgeInsets.all(28.0),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 560),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowLight,
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-
-            // Message
-            Text(
-              message,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: AppColors.text.withValues(alpha: 0.7),
-                height: 1.6,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildIcon(context),
+              const SizedBox(height: 20),
+              Text(
+                title,
+                style: GoogleFonts.tajawal(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryDark,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-
-            // Action button (if provided)
-            if (actionLabel != null && onAction != null)
-              ElevatedButton.icon(
-                onPressed: onAction,
-                icon: const Icon(Icons.explore_outlined),
-                label: Text(actionLabel!),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                style: GoogleFonts.tajawal(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textMuted,
+                  height: 1.55,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 22),
+              if (actionLabel != null && onAction != null)
+                FilledButton.icon(
+                  onPressed: onAction,
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  label: Text(actionLabel!),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -144,39 +156,45 @@ class EmptyState extends StatelessWidget {
   Widget _buildIcon(BuildContext context) {
     IconData iconData;
 
-    // Map string icon names to IconData
     switch (icon) {
       case 'bookmark_border':
-        iconData = Icons.bookmark_border;
+        iconData = Icons.bookmark_border_rounded;
         break;
       case 'search_off':
-        iconData = Icons.search_off;
+        iconData = Icons.search_off_rounded;
         break;
       case 'cloud_off':
-        iconData = Icons.cloud_off;
+        iconData = Icons.cloud_off_rounded;
         break;
       case 'error_outline':
-        iconData = Icons.error_outline;
+        iconData = Icons.error_outline_rounded;
         break;
       default:
         iconData = Icons.inbox_outlined;
     }
 
     return Container(
-      width: 100,
-      height: 100,
+      width: 92,
+      height: 92,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primary.withValues(alpha: 0.1),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primary.withValues(alpha: 0.2),
+            AppColors.primaryLight.withValues(alpha: 0.12),
+          ],
+        ),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-          width: 2,
+          color: AppColors.primary.withValues(alpha: 0.3),
+          width: 1.5,
         ),
       ),
       child: Icon(
         iconData,
-        size: 48,
-        color: AppColors.primary.withValues(alpha: 0.6),
+        size: 44,
+        color: AppColors.primaryDark,
       ),
     );
   }
@@ -208,9 +226,9 @@ class EmptyStateCompact extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             title,
-            style: GoogleFonts.notoNaskhArabic(
+            style: GoogleFonts.tajawal(
               fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w700,
               color: AppColors.text.withValues(alpha: 0.6),
             ),
           ),
@@ -218,7 +236,7 @@ class EmptyStateCompact extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle!,
-              style: GoogleFonts.notoNaskhArabic(
+              style: GoogleFonts.tajawal(
                 fontSize: 14,
                 color: AppColors.text.withValues(alpha: 0.4),
               ),

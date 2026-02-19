@@ -19,6 +19,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
   @override
   void initState() {
     super.initState();
@@ -45,13 +48,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = _isDark(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Settings',
-          style: GoogleFonts.notoNaskhArabic(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         centerTitle: true,
       ),
@@ -77,127 +80,217 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           final settings = state.settings;
 
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Statistics Section
-              const StatsWidget(),
-
-              const SizedBox(height: 16),
-
-              // Display Settings Section
-              _buildSectionHeader('Display', Icons.palette_outlined),
-              _buildCard(
-                children: [
-                  _buildFontSizeTile(settings),
-                  _buildDivider(),
-                  _buildSwitchTile(
-                    title: 'Dark Mode',
-                    subtitle: 'Use dark theme',
-                    value: settings.darkModeEnabled,
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(ToggleDarkMode(value));
-                    },
-                  ),
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  if (isDark)
+                    const Color(0xFF0A111A)
+                  else
+                    const Color(0xFFF7FAFC),
+                  if (isDark)
+                    const Color(0xFF0D1823)
+                  else
+                    const Color(0xFFF1F6FA),
+                  if (isDark)
+                    const Color(0xFF132334).withValues(alpha: 0.6)
+                  else
+                    const Color(0xFFE8F2F8).withValues(alpha: 0.6),
                 ],
               ),
-
-              const SizedBox(height: 16),
-
-              // Hadith Settings Section
-              _buildSectionHeader('Hadith', Icons.menu_book_outlined),
-              _buildCard(
-                children: [
-                  _buildCollectionTile(settings),
-                  _buildDivider(),
-                  _buildReminderIntervalTile(settings),
-                  _buildDivider(),
-                  _buildPopupDurationTile(settings),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Notifications Section
-              _buildSectionHeader('Notifications', Icons.notifications_outlined),
-              _buildCard(
-                children: [
-                  _buildSwitchTile(
-                    title: 'Notification Sound',
-                    subtitle: 'Play sound when Hadith popup appears',
-                    value: settings.soundEnabled,
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(ToggleSound(value));
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Application Settings Section
-              _buildSectionHeader('Application', Icons.apps_outlined),
-              _buildCard(
-                children: [
-                  _buildSwitchTile(
-                    title: 'Auto-start at Login',
-                    subtitle: 'Launch Hikma automatically when you log in',
-                    value: settings.autoStartEnabled,
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(ToggleAutoStart(value));
-                    },
-                  ),
-                  _buildDivider(),
-                  _buildSwitchTile(
-                    title: 'Show in Dock',
-                    subtitle: 'Display Hikma icon in macOS Dock',
-                    value: settings.showInDock,
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(ToggleShowInDock(value));
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // About link
-              Center(
-                child: TextButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const AboutScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.info_outline),
-                  label: const Text('About Hikma'),
+            ),
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildHeaderCard(settings),
+                const SizedBox(height: 16),
+                const StatsWidget(),
+                const SizedBox(height: 18),
+                _buildSectionHeader(context, 'Display', Icons.palette_outlined),
+                _buildCard(
+                  children: [
+                    _buildFontSizeTile(settings),
+                    _buildDivider(),
+                    _buildSwitchTile(
+                      title: 'Dark Mode',
+                      subtitle: 'Use dark theme',
+                      value: settings.darkModeEnabled,
+                      onChanged: (value) {
+                        context.read<SettingsBloc>().add(ToggleDarkMode(value));
+                      },
+                    ),
+                  ],
                 ),
-              ),
-
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+                _buildSectionHeader(
+                    context, 'Hadith', Icons.menu_book_outlined),
+                _buildCard(
+                  children: [
+                    _buildCollectionTile(settings),
+                    _buildDivider(),
+                    _buildReminderIntervalTile(settings),
+                    _buildDivider(),
+                    _buildPopupDurationTile(settings),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildSectionHeader(
+                  context,
+                  'Notifications',
+                  Icons.notifications_outlined,
+                ),
+                _buildCard(
+                  children: [
+                    _buildSwitchTile(
+                      title: 'Notification Sound',
+                      subtitle: 'Play sound when Hadith popup appears',
+                      value: settings.soundEnabled,
+                      onChanged: (value) {
+                        context.read<SettingsBloc>().add(ToggleSound(value));
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildSectionHeader(
+                    context, 'Application', Icons.apps_outlined),
+                _buildCard(
+                  children: [
+                    _buildSwitchTile(
+                      title: 'Auto-start at Login',
+                      subtitle: 'Launch Hikma automatically when you log in',
+                      value: settings.autoStartEnabled,
+                      onChanged: (value) {
+                        context
+                            .read<SettingsBloc>()
+                            .add(ToggleAutoStart(value));
+                      },
+                    ),
+                    _buildDivider(),
+                    _buildSwitchTile(
+                      title: 'Show in Dock',
+                      subtitle: 'Display Hikma icon in macOS Dock',
+                      value: settings.showInDock,
+                      onChanged: (value) {
+                        context
+                            .read<SettingsBloc>()
+                            .add(ToggleShowInDock(value));
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                Center(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const AboutScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.info_outline_rounded),
+                    label: const Text('About Hikma'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 0, 0, 8),
+  Widget _buildHeaderCard(UserSettings settings) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = _isDark(context);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            if (isDark)
+              const Color(0xFF10314C)
+            else
+              AppColors.primary.withValues(alpha: 0.96),
+            if (isDark) const Color(0xFF1A4364) else AppColors.primaryDark,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: scheme.primary.withValues(alpha: isDark ? 0.28 : 0.22),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.primary),
+          Container(
+            height: 46,
+            width: 46,
+            decoration: BoxDecoration(
+              color: AppColors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.tune_rounded,
+              color: AppColors.white,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Personalize Hikma',
+                  style: GoogleFonts.tajawal(
+                    color: scheme.onPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${settings.reminderInterval.displayLabel} reminders • ${settings.sourceCollection.displayName}',
+                  style: GoogleFonts.tajawal(
+                    color: scheme.onPrimary.withValues(alpha: 0.8),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(
+      BuildContext context, String title, IconData icon) {
+    final color = Theme.of(context).colorScheme.onSurface;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(6, 0, 0, 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: color.withValues(alpha: 0.92)),
           const SizedBox(width: 8),
           Text(
             title,
-            style: GoogleFonts.notoNaskhArabic(
+            style: GoogleFonts.tajawal(
               fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primary,
-              letterSpacing: 0.5,
+              fontWeight: FontWeight.w700,
+              color: color.withValues(alpha: 0.92),
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -206,10 +299,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildCard({required List<Widget> children}) {
+    final isDark = _isDark(context);
+    final scheme = Theme.of(context).colorScheme;
+
     return Card(
-      elevation: 2,
+      elevation: isDark ? 0 : 1,
+      shadowColor: AppColors.shadow,
+      color: scheme.surface.withValues(alpha: isDark ? 0.82 : 0.96),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: (isDark ? scheme.onSurface : AppColors.border).withValues(
+            alpha: isDark ? 0.16 : 1,
+          ),
+        ),
       ),
       child: Column(children: children),
     );
@@ -285,12 +388,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
-      title: Text(title),
-      subtitle: Text(subtitle),
-      activeThumbColor: AppColors.primary,
+      title: Text(
+        title,
+        style: GoogleFonts.tajawal(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      activeThumbColor: scheme.onPrimary,
+      activeTrackColor: scheme.primary.withValues(alpha: 0.72),
     );
   }
 

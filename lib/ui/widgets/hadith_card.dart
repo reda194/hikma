@@ -24,25 +24,29 @@ class HadithCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 1,
       shadowColor: AppColors.shadow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: AppColors.border,
+          width: 1,
+        ),
       ),
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: EdgeInsets.all(isCompact ? 16.0 : 24.0),
+          padding: EdgeInsets.all(isCompact ? 18.0 : 26.0),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
                 AppColors.white,
-                AppColors.surface.withValues(alpha: 0.3),
+                AppColors.surface.withValues(alpha: 0.45),
               ],
             ),
           ),
@@ -57,7 +61,7 @@ class HadithCard extends StatelessWidget {
                   hadith.arabicText,
                   style: GoogleFonts.notoNaskhArabic(
                     fontSize: fontSize,
-                    height: 2.0,
+                    height: 2.1,
                     color: AppColors.text,
                     fontWeight: FontWeight.w500,
                   ),

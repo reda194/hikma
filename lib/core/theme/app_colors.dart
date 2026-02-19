@@ -7,9 +7,14 @@ class AppColors {
   // Primary colors from PRD
   static const Color primary = Color(0xFF1B4F72); // Deep blue
   static const Color primaryLight = Color(0xFF117A65); // Green accent
+  static const Color primaryDark = Color(0xFF12344D); // Deep slate blue
   static const Color background = Color(0xFFF8F9FA); // Light background
+  static const Color backgroundSoft = Color(0xFFF2F5F7); // Soft tint layer
   static const Color text = Color(0xFF2C3E50); // Dark text
+  static const Color textMuted = Color(0xFF617181); // Secondary text
   static const Color surface = Color(0xFFEAF2F8); // Light blue card
+  static const Color surfaceElevated = Color(0xFFFFFFFF); // Elevated containers
+  static const Color border = Color(0xFFD6E1EA); // Subtle borders
 
   // UI colors
   static const Color white = Color(0xFFFFFFFF);

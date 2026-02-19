@@ -60,11 +60,12 @@ class _PopupContentState extends State<PopupContent> {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              AppColors.primary.withValues(alpha: 0.95),
-              AppColors.primary.withValues(alpha: 0.85),
+              AppColors.primaryDark.withValues(alpha: 0.95),
+              AppColors.primary.withValues(alpha: 0.9),
+              const Color(0xFF0D2D44).withValues(alpha: 0.95),
             ],
           ),
         ),
@@ -134,9 +135,9 @@ class _PopupContentState extends State<PopupContent> {
               const SizedBox(width: 8),
               Text(
                 'Hikma',
-                style: GoogleFonts.notoNaskhArabic(
+                style: GoogleFonts.tajawal(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: AppColors.white,
                 ),
               ),
@@ -193,10 +194,10 @@ class _PopupContentState extends State<PopupContent> {
                 const SizedBox(width: 6),
                 Text(
                   hadith.collection.displayName,
-                  style: const TextStyle(
+                  style: GoogleFonts.tajawal(
                     fontSize: 12,
                     color: AppColors.white,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -229,8 +230,8 @@ class _PopupContentState extends State<PopupContent> {
 
     return BlocBuilder<FavoritesBloc, FavoritesState>(
       builder: (context, favState) {
-        final isFavorite = favState is FavoritesLoaded &&
-            favState.isFavorite(hadith.id);
+        final isFavorite =
+            favState is FavoritesLoaded && favState.isFavorite(hadith.id);
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -246,7 +247,8 @@ class _PopupContentState extends State<PopupContent> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _ActionButton(
-                icon: isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                icon:
+                    isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
                 label: 'Save',
                 onTap: () {
                   context.read<FavoritesBloc>().add(
@@ -275,7 +277,8 @@ class _PopupContentState extends State<PopupContent> {
                 label: 'Next',
                 onTap: () {
                   context.read<HadithBloc>().add(
-                        const FetchRandomHadith(collection: HadithCollection.all),
+                        const FetchRandomHadith(
+                            collection: HadithCollection.all),
                       );
                 },
               ),
@@ -288,7 +291,7 @@ class _PopupContentState extends State<PopupContent> {
 
   Widget _buildCountdownIndicator(int seconds) {
     return Container(
-      height: 3,
+      height: 4,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -310,7 +313,8 @@ class _PopupContentState extends State<PopupContent> {
   /// Copy Hadith to clipboard with formatting
   /// Format: "Arabic text — Narrator | Source"
   Future<void> _copyHadithToClipboard(Hadith hadith) async {
-    final formattedText = '${hadith.arabicText} — ${hadith.narrator} | ${hadith.sourceBook}';
+    final formattedText =
+        '${hadith.arabicText} — ${hadith.narrator} | ${hadith.sourceBook}';
     await Clipboard.setData(ClipboardData(text: formattedText));
   }
 
@@ -328,26 +332,27 @@ class _PopupContentState extends State<PopupContent> {
           const SizedBox(height: 16),
           Text(
             'Could not load Hadith',
-            style: GoogleFonts.notoNaskhArabic(
+            style: GoogleFonts.tajawal(
               fontSize: 18,
               color: AppColors.white,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Please check your connection and try again',
-            style: TextStyle(
+            style: GoogleFonts.tajawal(
               fontSize: 14,
               color: AppColors.white.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
               context.read<HadithBloc>().add(
-                FetchRandomHadith(collection: HadithCollection.all),
-              );
+                    FetchRandomHadith(collection: HadithCollection.all),
+                  );
             },
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Try Again'),
@@ -415,30 +420,33 @@ class _ActionButtonState extends State<_ActionButton>
         },
         onTapCancel: () => _controller.reverse(),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? AppColors.white.withValues(alpha: 0.2)
-                : AppColors.transparent,
-            borderRadius: BorderRadius.circular(12),
+                ? AppColors.white.withValues(alpha: 0.24)
+                : AppColors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppColors.white.withValues(
+                alpha: widget.isActive ? 0.32 : 0.12,
+              ),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 widget.icon,
-                color: widget.isActive
-                    ? AppColors.favorite
-                    : AppColors.white,
+                color: widget.isActive ? AppColors.favorite : AppColors.white,
                 size: 20,
               ),
               const SizedBox(height: 2),
               Text(
                 widget.label,
-                style: TextStyle(
-                  fontSize: 10,
+                style: GoogleFonts.tajawal(
+                  fontSize: 11,
                   color: AppColors.white.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
