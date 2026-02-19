@@ -34,6 +34,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     super.dispose();
   }
 
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: AppColors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +89,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           _buildSearchBar(context),
           // Favorites list
           Expanded(
-            child: BlocBuilder<FavoritesBloc, FavoritesState>(
+            child: BlocConsumer<FavoritesBloc, FavoritesState>(
+              listener: (context, state) {
+                // Show error SnackBar for error states
+                if (state is FavoritesError) {
+                  _showErrorSnackBar(state.message);
+                }
+              },
               builder: (context, state) {
                 if (state is FavoritesLoading) {
                   return const Center(
@@ -80,12 +104,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 }
 
                 if (state is FavoritesError) {
-                  return EmptyState.error(
-                    errorMessage: state.message,
-                    onRetry: () {
-                      context.read<FavoritesBloc>().add(const LoadFavorites());
-                    },
-                  );
+                  // Return previous state if available, otherwise show error
+                  if (state is! FavoritesLoaded) {
+                    return EmptyState.error(
+                      errorMessage: state.message,
+                      onRetry: () {
+                        context.read<FavoritesBloc>().add(const LoadFavorites());
+                      },
+                    );
+                  }
                 }
 
                 if (state is FavoritesLoaded) {
@@ -131,7 +158,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadow.withOpacity(0.1),
+            color: AppColors.shadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -142,7 +169,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         decoration: InputDecoration(
           hintText: 'Search favorites...',
           hintStyle: TextStyle(
-            color: AppColors.text.withOpacity(0.5),
+            color: AppColors.text.withValues(alpha: 0.5),
           ),
           prefixIcon: const Icon(Icons.search_outlined),
           suffixIcon: _searchQuery.isNotEmpty
@@ -262,7 +289,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         '${hadith.sourceBook} - Book ${hadith.bookNumber}, Hadith ${hadith.hadithNumber}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.text.withOpacity(0.6),
+                          color: AppColors.text.withValues(alpha: 0.6),
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -288,7 +315,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         'Saved ${_formatDate(favorite.savedAt)}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.text.withOpacity(0.5),
+                          color: AppColors.text.withValues(alpha: 0.5),
                         ),
                       ),
 

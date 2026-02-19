@@ -23,8 +23,6 @@ class HadithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
       elevation: 4,
       shadowColor: AppColors.shadow,
@@ -44,7 +42,7 @@ class HadithCard extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 AppColors.white,
-                AppColors.surface.withOpacity(0.3),
+                AppColors.surface.withValues(alpha: 0.3),
               ],
             ),
           ),
@@ -76,7 +74,7 @@ class HadithCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       AppColors.transparent,
-                      AppColors.primary.withOpacity(0.3),
+                      AppColors.primary.withValues(alpha: 0.3),
                       AppColors.transparent,
                     ],
                   ),
@@ -144,7 +142,7 @@ class HadithCardTransparent extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   AppColors.transparent,
-                  AppColors.white.withOpacity(0.3),
+                  AppColors.white.withValues(alpha: 0.3),
                   AppColors.transparent,
                 ],
               ),

@@ -38,8 +38,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final settings = await _settingsRepository.loadSettings();
       emit(SettingsLoaded(settings: settings));
     } catch (e) {
-      // Return default settings on error
+      // Return default settings on error, but emit error state for UI feedback
       emit(SettingsLoaded(settings: const UserSettings()));
+      // Then emit error for notification
+      emit(SettingsError('Failed to load settings: ${e.toString()}'));
     }
   }
 
@@ -52,9 +54,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(event.settings);
       emit(SettingsLoaded(settings: event.settings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
       if (state is SettingsLoaded) {
         emit(state);
+        emit(SettingsError('Failed to save settings: ${e.toString()}'));
       }
     }
   }
@@ -75,7 +78,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update reminder interval: ${e.toString()}'));
+      }
     }
   }
 
@@ -95,7 +102,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update popup duration: ${e.toString()}'));
+      }
     }
   }
 
@@ -115,7 +126,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update source collection: ${e.toString()}'));
+      }
     }
   }
 
@@ -135,7 +150,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update font size: ${e.toString()}'));
+      }
     }
   }
 
@@ -155,7 +174,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update sound settings: ${e.toString()}'));
+      }
     }
   }
 
@@ -175,7 +198,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update auto-start settings: ${e.toString()}'));
+      }
     }
   }
 
@@ -195,7 +222,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update dock settings: ${e.toString()}'));
+      }
     }
   }
 
@@ -215,7 +246,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       await _settingsRepository.saveSettings(updatedSettings);
       emit(SettingsLoaded(settings: updatedSettings));
     } catch (e) {
-      // Keep current state on error
+      // Keep current state on error but emit error for notification
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError('Failed to update dark mode: ${e.toString()}'));
+      }
     }
   }
 }

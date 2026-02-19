@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:window_manager/window_manager.dart';
@@ -29,6 +28,7 @@ import 'ui/screens/settings_screen.dart';
 import 'ui/screens/favorites_screen.dart';
 import 'ui/screens/about_screen.dart';
 import 'ui/screens/contemplation_screen.dart';
+import 'ui/screens/onboarding_screen.dart';
 import 'ui/popup/hadith_popup.dart';
 
 void main() async {
@@ -94,6 +94,7 @@ class _HikmaAppState extends State<HikmaApp> {
     _schedulerBloc = SchedulerBloc(
       settingsRepository: _settingsRepository,
       hadithBloc: _hadithBloc,
+      popupBloc: _popupBloc,
     );
   }
 
@@ -181,11 +182,32 @@ class HikmaHome extends StatefulWidget {
 class _HikmaHomeState extends State<HikmaHome> {
   bool _isInitialized = false;
   bool _repositoriesInitialized = false;
+  bool _onboardingCompleted = false;
 
   @override
   void initState() {
     super.initState();
+    _checkOnboardingStatus();
     _initialize();
+  }
+
+  Future<void> _checkOnboardingStatus() async {
+    final settingsBox = Hive.box(StorageKeys.settingsBox);
+    final completed = settingsBox.get(
+      StorageKeys.onboardingCompleted,
+      defaultValue: false,
+    ) as bool;
+    if (mounted) {
+      setState(() {
+        _onboardingCompleted = completed;
+      });
+    }
+  }
+
+  void _completeOnboarding() {
+    setState(() {
+      _onboardingCompleted = true;
+    });
   }
 
   Future<void> _initialize() async {
@@ -193,8 +215,8 @@ class _HikmaHomeState extends State<HikmaHome> {
     if (!_repositoriesInitialized) {
       try {
         // Access repositories through the BLoCs to call init()
-        final hadithRepo = (widget.hadithBloc as HadithBloc).repository;
-        final settingsRepo = (widget.settingsBloc as SettingsBloc).repository;
+        final hadithRepo = widget.hadithBloc.repository;
+        final settingsRepo = widget.settingsBloc.repository;
         await hadithRepo.init();
         await settingsRepo.init();
         _repositoriesInitialized = true;
@@ -227,6 +249,13 @@ class _HikmaHomeState extends State<HikmaHome> {
 
   @override
   Widget build(BuildContext context) {
+    // Show onboarding screen if not completed
+    if (!_onboardingCompleted) {
+      return OnboardingScreen(
+        onOnboardingComplete: _completeOnboarding,
+      );
+    }
+
     return BlocListener<SettingsBloc, SettingsState>(
       bloc: widget.settingsBloc,
       listener: (context, state) {

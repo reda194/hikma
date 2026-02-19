@@ -28,6 +28,9 @@ class StorageKeys {
   // Reading statistics key
   static const String readStatistics = 'read_statistics';
 
+  // Onboarding key
+  static const String onboardingCompleted = 'onboarding_completed';
+
   // Cache keys
   static const String cachePrefix = 'cached_';
   static const String cacheTimestamp = 'cached_at';

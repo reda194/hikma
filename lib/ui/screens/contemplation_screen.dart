@@ -88,10 +88,10 @@ class _ContemplationScreenState extends State<ContemplationScreen>
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
+    return KeyboardListener(
       focusNode: FocusNode(),
-      onKey: (event) {
-        if (event is RawKeyDownEvent) {
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent) {
           if (event.logicalKey == LogicalKeyboardKey.escape) {
             _exit();
           } else if (event.logicalKey == LogicalKeyboardKey.keyN) {
@@ -106,9 +106,9 @@ class _ContemplationScreenState extends State<ContemplationScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                AppColors.primary.withOpacity(0.95),
+                AppColors.primary.withValues(alpha: 0.95),
                 AppColors.primary,
-                AppColors.primary.withOpacity(0.95),
+                AppColors.primary.withValues(alpha: 0.95),
               ],
             ),
           ),
@@ -155,7 +155,7 @@ class _ContemplationScreenState extends State<ContemplationScreen>
                                     '${_currentHadith!.narrator} | ${_currentHadith!.sourceBook}',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.white.withOpacity(0.7),
+                                      color: AppColors.white.withValues(alpha: 0.7),
                                       fontStyle: FontStyle.italic,
                                     ),
                                     textAlign: TextAlign.center,
@@ -193,7 +193,7 @@ class _ContemplationScreenState extends State<ContemplationScreen>
             'Contemplation Mode',
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 14,
-              color: AppColors.white.withOpacity(0.7),
+              color: AppColors.white.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(width: 48), // Balance the close button
@@ -242,10 +242,10 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.white.withOpacity(0.15),
+          color: AppColors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: AppColors.white.withOpacity(0.2),
+            color: AppColors.white.withValues(alpha: 0.2),
           ),
         ),
         child: Row(

@@ -3,14 +3,9 @@ import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../data/models/hadith.dart';
-import '../../data/models/user_settings.dart';
 import '../../bloc/popup/popup_bloc.dart';
 import '../../bloc/popup/popup_event.dart';
 import '../../bloc/popup/popup_state.dart';
-import '../../bloc/hadith/hadith_bloc.dart';
-import '../../bloc/hadith/hadith_state.dart';
-import '../../bloc/favorites/favorites_bloc.dart';
-import '../../bloc/favorites/favorites_state.dart';
 import '../../core/theme/app_colors.dart';
 import 'popup_content.dart';
 
@@ -74,7 +69,7 @@ class _HadithPopupState extends State<HadithPopup>
     // Apply frosted glass effect
     await Window.setEffect(
       effect: widget.windowEffect,
-      color: widget.backgroundColor.withOpacity(0.3),
+      color: widget.backgroundColor.withValues(alpha: 0.3),
       dark: true,
     );
   }
@@ -182,47 +177,8 @@ class _HadithPopupState extends State<HadithPopup>
       height: 4,
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.5),
+        color: AppColors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(2),
-      ),
-    );
-  }
-}
-
-/// Simplified popup without window_manager (for in-app dialogs)
-class HadithPopupDialog extends StatelessWidget {
-  final Hadith hadith;
-  final VoidCallback? onClose;
-
-  const HadithPopupDialog({
-    super.key,
-    required this.hadith,
-    this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppColors.transparent,
-      elevation: 0,
-      child: Container(
-        width: 400,
-        constraints: const BoxConstraints(maxWidth: 400),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.85),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 30,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: PopupContent(
-          hadith: hadith,
-          onClose: onClose ?? () => Navigator.of(context).pop(),
-        ),
       ),
     );
   }
@@ -246,7 +202,7 @@ class HadithPopupOverlay extends StatelessWidget {
     return showGeneralDialog<T>(
       context: context,
       barrierDismissible: true,
-      barrierColor: AppColors.black.withOpacity(0.5),
+      barrierColor: AppColors.black.withValues(alpha: 0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return HadithPopupOverlay(
@@ -280,7 +236,7 @@ class HadithPopupOverlay extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.8,
               constraints: const BoxConstraints(maxWidth: 500, minWidth: 350),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.9),
+                color: AppColors.primary.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
