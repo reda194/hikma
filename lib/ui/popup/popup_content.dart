@@ -10,6 +10,8 @@ import '../../bloc/hadith/hadith_state.dart';
 import '../../bloc/favorites/favorites_bloc.dart';
 import '../../bloc/favorites/favorites_state.dart';
 import '../../bloc/favorites/favorites_event.dart';
+import '../../bloc/popup/popup_bloc.dart';
+import '../../bloc/popup/popup_event.dart' as popup_event;
 import '../../core/theme/app_colors.dart';
 import '../widgets/hadith_card.dart';
 
@@ -37,6 +39,7 @@ class PopupContent extends StatefulWidget {
 
 class _PopupContentState extends State<PopupContent> {
   Hadith? _currentHadith;
+  double _fontScale = 0.9;
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class _PopupContentState extends State<PopupContent> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -68,12 +71,10 @@ class _PopupContentState extends State<PopupContent> {
               const Color(0xFF0E2D46).withValues(alpha: 0.94),
             ],
           ),
-          border: Border.all(
-            color: AppColors.white.withValues(alpha: 0.14),
-          ),
+          border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
           children: [
             // Header with drag indicator and close button
             _buildHeader(context),
@@ -115,16 +116,15 @@ class _PopupContentState extends State<PopupContent> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(14, 10, 10, 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // App title/icon
           Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: AppColors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -132,20 +132,41 @@ class _PopupContentState extends State<PopupContent> {
                 child: const Icon(
                   Icons.auto_stories_rounded,
                   color: AppColors.white,
-                  size: 18,
+                  size: 16,
                 ),
               ),
               const SizedBox(width: 8),
               Text(
                 'Hikma',
                 style: GoogleFonts.cormorantGaramond(
-                  fontSize: 28,
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.white,
                 ),
               ),
             ],
           ),
+          const Spacer(),
+          _HeaderControlButton(
+            icon: Icons.text_decrease_rounded,
+            tooltip: 'Smaller text',
+            onTap: () {
+              setState(() {
+                _fontScale = (_fontScale - 0.08).clamp(0.72, 1.28);
+              });
+            },
+          ),
+          const SizedBox(width: 6),
+          _HeaderControlButton(
+            icon: Icons.text_increase_rounded,
+            tooltip: 'Larger text',
+            onTap: () {
+              setState(() {
+                _fontScale = (_fontScale + 0.08).clamp(0.72, 1.28);
+              });
+            },
+          ),
+          const SizedBox(width: 6),
 
           // Close button
           if (widget.isDismissible)
@@ -154,7 +175,7 @@ class _PopupContentState extends State<PopupContent> {
               icon: const Icon(Icons.close_rounded),
               color: AppColors.white,
               tooltip: 'Close',
-              iconSize: 20,
+              iconSize: 18,
               padding: const EdgeInsets.all(4),
               constraints: const BoxConstraints(),
             ),
@@ -165,13 +186,13 @@ class _PopupContentState extends State<PopupContent> {
 
   Widget _buildHadithContent(BuildContext context, Hadith hadith) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Column(
         children: [
           // Hadith card with transparent background
           HadithCardTransparent(
             hadith: hadith,
-            fontSize: 26.0,
+            fontSize: (22.0 * _fontScale).clamp(17.0, 30.0),
           ),
           const SizedBox(height: 8),
 
@@ -237,7 +258,7 @@ class _PopupContentState extends State<PopupContent> {
             favState is FavoritesLoaded && favState.isFavorite(hadith.id);
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.white.withValues(alpha: 0.09),
             border: Border(
@@ -279,10 +300,9 @@ class _PopupContentState extends State<PopupContent> {
                 icon: Icons.refresh_rounded,
                 label: 'Next',
                 onTap: () {
-                  context.read<HadithBloc>().add(
-                        const FetchRandomHadith(
-                            collection: HadithCollection.all),
-                      );
+                  context
+                      .read<PopupBloc>()
+                      .add(const popup_event.ShowNextHadith());
                 },
               ),
             ],
@@ -423,7 +443,7 @@ class _ActionButtonState extends State<_ActionButton>
         },
         onTapCancel: () => _controller.reverse(),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isActive
                 ? AppColors.white.withValues(alpha: 0.24)
@@ -441,18 +461,57 @@ class _ActionButtonState extends State<_ActionButton>
               Icon(
                 widget.icon,
                 color: widget.isActive ? AppColors.favorite : AppColors.white,
-                size: 20,
+                size: 18,
               ),
               const SizedBox(height: 2),
               Text(
                 widget.label,
                 style: GoogleFonts.tajawal(
-                  fontSize: 11,
+                  fontSize: 10,
                   color: AppColors.white.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w700,
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderControlButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _HeaderControlButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: AppColors.white.withValues(alpha: 0.14),
+            ),
+          ),
+          child: Icon(
+            icon,
+            size: 15,
+            color: AppColors.white.withValues(alpha: 0.92),
           ),
         ),
       ),

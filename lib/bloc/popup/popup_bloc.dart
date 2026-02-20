@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,18 +106,21 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
       _audioService.playNotificationSound();
     }
 
-    // Show native popup via platform channel
-    try {
-      await PopupWindowManager.showPopup(
-        hadith: event.hadith,
-        positionType: _currentPositionType,
-        duration: _currentDisplayDuration,
-      );
-    } catch (e) {
-      // Fallback to Flutter dialog if native popup fails
-      debugPrint('Native popup failed, showing dialog: $e');
-      _emitDialogState(event, settings, emit);
-      return;
+    // On macOS we render popup content in the main Flutter window to avoid
+    // second-engine rendering issues that can produce a blank/black window.
+    if (!Platform.isMacOS) {
+      try {
+        await PopupWindowManager.showPopup(
+          hadith: event.hadith,
+          positionType: _currentPositionType,
+          duration: _currentDisplayDuration,
+        );
+      } catch (e) {
+        // Fallback to Flutter dialog if native popup fails
+        debugPrint('Native popup failed, showing dialog: $e');
+        _emitDialogState(event, settings, emit);
+        return;
+      }
     }
 
     // Emit state with full Hadith object
@@ -159,7 +163,9 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
     Emitter<PopupState> emit,
   ) async {
     _autoDismissTimer?.cancel();
-    await PopupWindowManager.hidePopup();
+    if (!Platform.isMacOS) {
+      await PopupWindowManager.hidePopup();
+    }
 
     PopupPosition? lastPosition;
     if (state is PopupVisible) {
@@ -175,7 +181,9 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
     Emitter<PopupState> emit,
   ) async {
     _autoDismissTimer?.cancel();
-    await PopupWindowManager.hidePopup();
+    if (!Platform.isMacOS) {
+      await PopupWindowManager.hidePopup();
+    }
 
     PopupPosition? lastPosition;
     if (state is PopupVisible) {
@@ -206,7 +214,8 @@ class PopupBloc extends Bloc<PopupEvent, PopupState> {
     _remainingMillis = event.duration.inMilliseconds;
 
     // Start countdown timer (updates every 100ms for smooth progress)
-    _autoDismissTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _autoDismissTimer =
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (!_isHovered) {
         _remainingMillis -= 100;
 
@@ -288,7 +297,8 @@ ${hadith.arabicText}
 ${hadith.narrator}
 ${hadith.sourceBook} - ${hadith.chapter}
 Hadith ${hadith.hadithNumber}
-'''.trim();
+'''
+        .trim();
 
     await Clipboard.setData(ClipboardData(text: formattedText));
     debugPrint('Copied Hadith to clipboard');
@@ -308,7 +318,7 @@ Hadith ${hadith.hadithNumber}
     // We need to subscribe to HadithBloc state changes
     _hadithBlocSubscription?.cancel();
     _hadithBlocSubscription = _hadithBloc.stream.listen((hadithState) {
-      if (hadithState is HadithLoaded && hadithState.hadith.id != _currentHadith?.id) {
+      if (hadithState is HadithLoaded) {
         add(ShowPopup(hadith: hadithState.hadith));
         _hadithBlocSubscription?.cancel();
       }

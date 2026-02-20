@@ -14,6 +14,7 @@ class UserSettings extends Equatable {
   final PopupPosition? popupPosition;
   final PopupPositionType popupPositionType;
   final int popupDisplayDuration;
+  final PopupLayoutMode popupLayoutMode;
 
   const UserSettings({
     this.reminderInterval = ReminderInterval.hour1,
@@ -27,6 +28,7 @@ class UserSettings extends Equatable {
     this.popupPosition,
     this.popupPositionType = PopupPositionType.bottomRight,
     this.popupDisplayDuration = 8,
+    this.popupLayoutMode = PopupLayoutMode.compact,
   });
 
   UserSettings copyWith({
@@ -41,6 +43,7 @@ class UserSettings extends Equatable {
     PopupPosition? popupPosition,
     PopupPositionType? popupPositionType,
     int? popupDisplayDuration,
+    PopupLayoutMode? popupLayoutMode,
   }) {
     return UserSettings(
       reminderInterval: reminderInterval ?? this.reminderInterval,
@@ -54,6 +57,7 @@ class UserSettings extends Equatable {
       popupPosition: popupPosition ?? this.popupPosition,
       popupPositionType: popupPositionType ?? this.popupPositionType,
       popupDisplayDuration: popupDisplayDuration ?? this.popupDisplayDuration,
+      popupLayoutMode: popupLayoutMode ?? this.popupLayoutMode,
     );
   }
 
@@ -70,6 +74,7 @@ class UserSettings extends Equatable {
       if (popupPosition != null) 'popupPosition': popupPosition!.toJson(),
       'popupPositionType': popupPositionType.index,
       'popupDisplayDuration': popupDisplayDuration,
+      'popupLayoutMode': popupLayoutMode.index,
     };
   }
 
@@ -100,6 +105,9 @@ class UserSettings extends Equatable {
         json['popupPositionType'] as int? ?? 3,
       ),
       popupDisplayDuration: json['popupDisplayDuration'] as int? ?? 8,
+      popupLayoutMode: PopupLayoutMode.fromIndex(
+        json['popupLayoutMode'] as int? ?? 0,
+      ),
     );
   }
 
@@ -116,6 +124,7 @@ class UserSettings extends Equatable {
         popupPosition,
         popupPositionType,
         popupDisplayDuration,
+        popupLayoutMode,
       ];
 }
 
@@ -126,7 +135,10 @@ enum ReminderInterval {
   hours2,
   hours4,
   hours8,
-  daily;
+  daily,
+  minute1,
+  minutes2,
+  minutes3;
 
   Duration get duration {
     switch (this) {
@@ -142,6 +154,12 @@ enum ReminderInterval {
         return const Duration(hours: 8);
       case ReminderInterval.daily:
         return const Duration(days: 1);
+      case ReminderInterval.minute1:
+        return const Duration(minutes: 1);
+      case ReminderInterval.minutes2:
+        return const Duration(minutes: 2);
+      case ReminderInterval.minutes3:
+        return const Duration(minutes: 3);
     }
   }
 
@@ -159,6 +177,12 @@ enum ReminderInterval {
         return '8 hours';
       case ReminderInterval.daily:
         return 'Daily';
+      case ReminderInterval.minute1:
+        return '1 minute';
+      case ReminderInterval.minutes2:
+        return '2 minutes';
+      case ReminderInterval.minutes3:
+        return '3 minutes';
     }
   }
 
@@ -213,6 +237,27 @@ enum PopupDuration {
       return values[index];
     }
     return minutes2;
+  }
+}
+
+enum PopupLayoutMode {
+  compact,
+  spacious;
+
+  String get displayLabel {
+    switch (this) {
+      case PopupLayoutMode.compact:
+        return 'Compact';
+      case PopupLayoutMode.spacious:
+        return 'Spacious';
+    }
+  }
+
+  static PopupLayoutMode fromIndex(int index) {
+    if (index >= 0 && index < values.length) {
+      return values[index];
+    }
+    return compact;
   }
 }
 

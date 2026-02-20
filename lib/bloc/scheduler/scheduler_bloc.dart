@@ -18,7 +18,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
 
   Timer? _schedulerTimer;
   Timer? _elapsedTimer;
-  Timer? _popupDelayTimer;
+  StreamSubscription<HadithState>? _hadithStateSubscription;
   int _elapsedSeconds = 0;
 
   SchedulerBloc({
@@ -39,7 +39,7 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
   Future<void> close() {
     _schedulerTimer?.cancel();
     _elapsedTimer?.cancel();
-    _popupDelayTimer?.cancel();
+    _hadithStateSubscription?.cancel();
     return super.close();
   }
 
@@ -88,17 +88,8 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
           ));
         }
 
-        // Trigger a new Hadith fetch
-        _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
-
-        // Wait for Hadith to load, then trigger popup
-        _popupDelayTimer?.cancel();
-        _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
-          final hadithState = _hadithBloc.state;
-          if (hadithState is HadithLoaded) {
-            _popupBloc.add(ShowPopup(hadith: hadithState.hadith));
-          }
-        });
+        // Fetch then show popup when HadithLoaded arrives.
+        _requestHadithAndShowPopup(collection: settings.sourceCollection);
 
         // Schedule next popup
         add(const StartScheduler());
@@ -169,16 +160,9 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
           ));
         }
 
-        // Trigger a new Hadith fetch
-        _hadithBloc.add(const FetchRandomHadith(collection: HadithCollection.all));
-
-        // Wait for Hadith to load, then trigger popup
-        _popupDelayTimer?.cancel();
-        _popupDelayTimer = Timer(const Duration(milliseconds: 500), () {
-          final hadithState = _hadithBloc.state;
-          if (hadithState is HadithLoaded) {
-            _popupBloc.add(ShowPopup(hadith: hadithState.hadith));
-          }
+        // Use latest settings collection when the timer fires.
+        _settingsRepository.loadSettings().then((settings) {
+          _requestHadithAndShowPopup(collection: settings.sourceCollection);
         });
 
         // Schedule next popup
@@ -196,5 +180,24 @@ class SchedulerBloc extends Bloc<SchedulerEvent, SchedulerState> {
       // Restart scheduler with new interval
       add(const StartScheduler());
     }
+  }
+
+  void _requestHadithAndShowPopup({
+    required HadithCollection collection,
+  }) {
+    _hadithStateSubscription?.cancel();
+
+    _hadithStateSubscription = _hadithBloc.stream.listen((state) {
+      if (state is HadithLoaded) {
+        _popupBloc.add(ShowPopup(hadith: state.hadith));
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      } else if (state is HadithError) {
+        _hadithStateSubscription?.cancel();
+        _hadithStateSubscription = null;
+      }
+    });
+
+    _hadithBloc.add(FetchRandomHadith(collection: collection));
   }
 }

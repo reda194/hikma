@@ -24,6 +24,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ToggleDarkMode>(_onToggleDarkMode);
     on<UpdatePopupPositionType>(_onUpdatePopupPositionType);
     on<UpdatePopupDisplayDuration>(_onUpdatePopupDisplayDuration);
+    on<UpdatePopupLayoutMode>(_onUpdatePopupLayoutMode);
   }
 
   /// Expose repository for external initialization
@@ -83,7 +84,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // Keep current state on error but emit error for notification
       if (state is SettingsLoaded) {
         emit(state);
-        emit(SettingsError('Failed to update reminder interval: ${e.toString()}'));
+        emit(SettingsError(
+            'Failed to update reminder interval: ${e.toString()}'));
       }
     }
   }
@@ -131,7 +133,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // Keep current state on error but emit error for notification
       if (state is SettingsLoaded) {
         emit(state);
-        emit(SettingsError('Failed to update source collection: ${e.toString()}'));
+        emit(SettingsError(
+            'Failed to update source collection: ${e.toString()}'));
       }
     }
   }
@@ -203,7 +206,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // Keep current state on error but emit error for notification
       if (state is SettingsLoaded) {
         emit(state);
-        emit(SettingsError('Failed to update auto-start settings: ${e.toString()}'));
+        emit(SettingsError(
+            'Failed to update auto-start settings: ${e.toString()}'));
       }
     }
   }
@@ -299,7 +303,32 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       // Keep current state on error but emit error for notification
       if (state is SettingsLoaded) {
         emit(state);
-        emit(SettingsError('Failed to update display duration: ${e.toString()}'));
+        emit(SettingsError(
+            'Failed to update display duration: ${e.toString()}'));
+      }
+    }
+  }
+
+  /// Handle UpdatePopupLayoutMode event
+  Future<void> _onUpdatePopupLayoutMode(
+    UpdatePopupLayoutMode event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (state is! SettingsLoaded) return;
+
+    try {
+      final currentState = state as SettingsLoaded;
+      final updatedSettings = currentState.settings.copyWith(
+        popupLayoutMode: event.mode,
+      );
+
+      await _settingsRepository.saveSettings(updatedSettings);
+      emit(SettingsLoaded(settings: updatedSettings));
+    } catch (e) {
+      if (state is SettingsLoaded) {
+        emit(state);
+        emit(SettingsError(
+            'Failed to update popup layout mode: ${e.toString()}'));
       }
     }
   }

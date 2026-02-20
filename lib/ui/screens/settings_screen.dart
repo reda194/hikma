@@ -119,6 +119,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       _buildFontSizeTile(settings),
                       _buildDivider(),
+                      _buildPopupLayoutTile(settings),
+                      _buildDivider(),
                       _buildSwitchTile(
                         title: 'Dark Mode',
                         subtitle: 'Use dark theme',
@@ -374,6 +376,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
       subtitle: Text(settings.sourceCollection.displayName),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showCollectionPicker(context, settings.sourceCollection),
+    );
+  }
+
+  Widget _buildPopupLayoutTile(UserSettings settings) {
+    return ListTile(
+      leading: const Icon(Icons.aspect_ratio_rounded),
+      title: const Text('Popup Layout'),
+      subtitle: Text(settings.popupLayoutMode.displayLabel),
+      trailing: SegmentedButton<PopupLayoutMode>(
+        segments: const [
+          ButtonSegment(
+            value: PopupLayoutMode.compact,
+            label: Text('Compact'),
+          ),
+          ButtonSegment(
+            value: PopupLayoutMode.spacious,
+            label: Text('Spacious'),
+          ),
+        ],
+        selected: {settings.popupLayoutMode},
+        onSelectionChanged: (selection) {
+          context.read<SettingsBloc>().add(
+                UpdatePopupLayoutMode(selection.first),
+              );
+        },
+      ),
     );
   }
 

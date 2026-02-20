@@ -19,6 +19,7 @@ class StorageKeys {
   static const String popupPosition = 'popup_position';
   static const String popupPositionType = 'popup_position_type';
   static const String popupDisplayDuration = 'popup_display_duration';
+  static const String popupLayoutMode = 'popup_layout_mode';
 
   // Daily Hadith keys
   static const String dailyHadithId = 'daily_hadith_id';

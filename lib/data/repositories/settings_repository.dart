@@ -40,8 +40,12 @@ class SettingsRepository {
         _settingsBox.get(StorageKeys.darkModeEnabled, defaultValue: false);
 
     final positionData = _settingsBox.get(StorageKeys.popupPosition);
-    final positionTypeIndex = _settingsBox.get(StorageKeys.popupPositionType, defaultValue: 3);
-    final displayDuration = _settingsBox.get(StorageKeys.popupDisplayDuration, defaultValue: 8);
+    final positionTypeIndex =
+        _settingsBox.get(StorageKeys.popupPositionType, defaultValue: 3);
+    final displayDuration =
+        _settingsBox.get(StorageKeys.popupDisplayDuration, defaultValue: 8);
+    final layoutModeIndex =
+        _settingsBox.get(StorageKeys.popupLayoutMode, defaultValue: 0);
 
     return UserSettings(
       reminderInterval: ReminderInterval.fromIndex(intervalIndex as int),
@@ -59,6 +63,7 @@ class SettingsRepository {
           : null,
       popupPositionType: PopupPositionType.fromIndex(positionTypeIndex as int),
       popupDisplayDuration: displayDuration as int,
+      popupLayoutMode: PopupLayoutMode.fromIndex(layoutModeIndex as int),
     );
   }
 
@@ -116,6 +121,11 @@ class SettingsRepository {
     await _settingsBox.put(
       StorageKeys.popupDisplayDuration,
       settings.popupDisplayDuration,
+    );
+
+    await _settingsBox.put(
+      StorageKeys.popupLayoutMode,
+      settings.popupLayoutMode.index,
     );
   }
 

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -25,6 +23,7 @@ import 'data/repositories/hadith_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'data/repositories/favorites_repository.dart';
 import 'data/services/audio_service.dart';
+import 'data/models/user_settings.dart';
 import 'ui/screens/settings_screen.dart';
 import 'ui/screens/favorites_screen.dart';
 import 'ui/screens/about_screen.dart';
@@ -186,7 +185,8 @@ class _HikmaHomeState extends State<HikmaHome> {
   bool _repositoriesInitialized = false;
   bool _onboardingCompleted = false;
   Rect? _normalWindowBounds;
-  static const Size _popupWindowSize = Size(760, 640);
+  static const Size _homeMinWindowSize = Size(760, 520);
+  Size _popupWindowSize = const Size(760, 500);
 
   @override
   void initState() {
@@ -241,6 +241,8 @@ class _HikmaHomeState extends State<HikmaHome> {
 
     // Hide from dock initially
     await windowManager.setPreventClose(true);
+    await windowManager.setMinimumSize(_homeMinWindowSize);
+    await windowManager.setMaximumSize(const Size(4096, 4096));
     await windowManager.setTitleBarStyle(
       TitleBarStyle.hidden,
       windowButtonVisibility: true,
@@ -258,6 +260,7 @@ class _HikmaHomeState extends State<HikmaHome> {
 
   Future<void> _enterPopupMode(PopupVisible popupState) async {
     _normalWindowBounds ??= await windowManager.getBounds();
+    _popupWindowSize = _resolvePopupWindowSize(popupState);
 
     await windowManager.setAlwaysOnTop(true);
     await windowManager.setResizable(false);
@@ -278,10 +281,27 @@ class _HikmaHomeState extends State<HikmaHome> {
     await windowManager.focus();
   }
 
+  Size _resolvePopupWindowSize(PopupVisible popupState) {
+    final settingsState = widget.settingsBloc.state;
+    final mode = settingsState is SettingsLoaded
+        ? settingsState.settings.popupLayoutMode
+        : PopupLayoutMode.compact;
+
+    final textLength = popupState.hadith.arabicText.trim().length;
+    final estimatedLines = (textLength / 42).ceil().clamp(3, 16);
+    final baseHeight = mode == PopupLayoutMode.compact ? 300.0 : 350.0;
+    final perLine = mode == PopupLayoutMode.compact ? 14.0 : 17.0;
+    final minHeight = mode == PopupLayoutMode.compact ? 380.0 : 440.0;
+    final maxHeight = mode == PopupLayoutMode.compact ? 540.0 : 620.0;
+    final dynamicHeight = (baseHeight + (estimatedLines * perLine) + 120)
+        .clamp(minHeight, maxHeight);
+    return Size(760, dynamicHeight);
+  }
+
   Future<void> _exitPopupMode() async {
     await windowManager.setAlwaysOnTop(false);
     await windowManager.setResizable(true);
-    await windowManager.setMinimumSize(const Size(600, 420));
+    await windowManager.setMinimumSize(_homeMinWindowSize);
     await windowManager.setMaximumSize(const Size(4096, 4096));
     await windowManager.setTitleBarStyle(
       TitleBarStyle.hidden,
@@ -323,23 +343,16 @@ class _HikmaHomeState extends State<HikmaHome> {
           bloc: widget.popupBloc,
           listener: (context, popupState) async {
             if (popupState is PopupVisible) {
-              if (Platform.isMacOS) {
-                // macOS uses a native floating NSPanel popup; keep app window hidden.
-                await windowManager.hide();
-              } else {
-                await _enterPopupMode(popupState);
-              }
+              await _enterPopupMode(popupState);
               return;
             }
             if (popupState is PopupHidden) {
-              if (!Platform.isMacOS) {
-                await _exitPopupMode();
-              }
+              await _exitPopupMode();
               await windowManager.hide();
             }
           },
           builder: (context, popupState) {
-            if (popupState is PopupVisible && !Platform.isMacOS) {
+            if (popupState is PopupVisible) {
               return _buildPopupWindow(popupState);
             }
             return _buildHomeWindow();
@@ -384,131 +397,168 @@ class _HikmaHomeState extends State<HikmaHome> {
                 color: scheme.secondary.withValues(alpha: isDark ? 0.2 : 0.16),
               ),
             ),
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 720),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 28),
-                  padding: const EdgeInsets.fromLTRB(34, 36, 34, 30),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(36),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        scheme.surface.withValues(alpha: isDark ? 0.32 : 0.84),
-                        scheme.surface.withValues(alpha: isDark ? 0.18 : 0.58),
-                      ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final cardWidth =
+                    (constraints.maxWidth - 56).clamp(320.0, 760.0).toDouble();
+                final statusWidth =
+                    (cardWidth - 40).clamp(240.0, 560.0).toDouble();
+
+                return SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 28,
                     ),
-                    border: Border.all(
-                      color: scheme.onSurface
-                          .withValues(alpha: isDark ? 0.2 : 0.12),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black
-                            .withValues(alpha: isDark ? 0.24 : 0.08),
-                        blurRadius: 40,
-                        offset: const Offset(0, 24),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight:
+                            (constraints.maxHeight - 56).clamp(0.0, 3000.0),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        height: 86,
-                        width: 86,
-                        decoration: BoxDecoration(
-                          color: scheme.primary
-                              .withValues(alpha: isDark ? 0.26 : 0.15),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: scheme.primary.withValues(alpha: 0.35),
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.auto_stories_rounded,
-                          size: 42,
-                          color: scheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        'Hikma',
-                        style: GoogleFonts.cormorantGaramond(
-                          fontSize: 56,
-                          fontWeight: FontWeight.w700,
-                          color: scheme.onSurface,
-                          height: 0.95,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Liquid wisdom panel for timeless daily hadith reflection',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.tajawal(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.2,
-                          color: scheme.onSurface.withValues(alpha: 0.72),
-                        ),
-                      ),
-                      const SizedBox(height: 26),
-                      _isInitialized
-                          ? Container(
-                              width: 560,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 14,
-                              ),
-                              decoration: BoxDecoration(
-                                color: scheme.secondary.withValues(alpha: 0.14),
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color:
-                                      scheme.secondary.withValues(alpha: 0.38),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.check_circle_rounded,
-                                    size: 20,
-                                    color: scheme.secondary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Running in background via menu bar and dock',
-                                    style: GoogleFonts.tajawal(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: scheme.secondary,
-                                    ),
-                                  ),
+                      child: Center(
+                        child: SizedBox(
+                          width: cardWidth,
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(36),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  scheme.surface
+                                      .withValues(alpha: isDark ? 0.32 : 0.84),
+                                  scheme.surface
+                                      .withValues(alpha: isDark ? 0.18 : 0.58),
                                 ],
                               ),
-                            )
-                          : const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: CircularProgressIndicator(),
+                              border: Border.all(
+                                color: scheme.onSurface
+                                    .withValues(alpha: isDark ? 0.2 : 0.12),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withValues(alpha: isDark ? 0.24 : 0.08),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 24),
+                                ),
+                              ],
                             ),
-                      const SizedBox(height: 14),
-                      Text(
-                        'Close the window anytime. Hikma stays alive in the background and is always reachable from the menu bar and Dock.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.tajawal(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w500,
-                          color: scheme.onSurface.withValues(alpha: 0.68),
-                          height: 1.45,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 102,
+                                  width: 102,
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    color: scheme.primary.withValues(
+                                        alpha: isDark ? 0.26 : 0.15),
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: scheme.primary
+                                          .withValues(alpha: 0.35),
+                                    ),
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/brand_logo.png',
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(height: 18),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Hikma',
+                                    maxLines: 1,
+                                    style: GoogleFonts.cormorantGaramond(
+                                      fontSize: 56,
+                                      fontWeight: FontWeight.w700,
+                                      color: scheme.onSurface,
+                                      height: 0.95,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Liquid wisdom panel for timeless daily hadith reflection',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.tajawal(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.2,
+                                    color: scheme.onSurface
+                                        .withValues(alpha: 0.72),
+                                  ),
+                                ),
+                                const SizedBox(height: 26),
+                                _isInitialized
+                                    ? Container(
+                                        width: statusWidth,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: scheme.secondary
+                                              .withValues(alpha: 0.14),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          border: Border.all(
+                                            color: scheme.secondary
+                                                .withValues(alpha: 0.38),
+                                          ),
+                                        ),
+                                        child: Wrap(
+                                          alignment: WrapAlignment.center,
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          spacing: 8,
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle_rounded,
+                                              size: 20,
+                                              color: scheme.secondary,
+                                            ),
+                                            Text(
+                                              'Running in background via menu bar and dock',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.tajawal(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: scheme.secondary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : const Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 8),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                const SizedBox(height: 14),
+                                Text(
+                                  'Close the window anytime. Hikma stays alive in the background and is always reachable from the menu bar and Dock.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.tajawal(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: scheme.onSurface
+                                        .withValues(alpha: 0.68),
+                                    height: 1.45,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -521,29 +571,24 @@ class _HikmaHomeState extends State<HikmaHome> {
     final remainingSeconds = (popupState.remainingMillis / 1000).ceil();
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Center(
-          child: GestureDetector(
-            onPanStart: (_) async {
-              await windowManager.startDragging();
-            },
-            onPanEnd: (_) async {
-              final position = await windowManager.getPosition();
-              widget.popupBloc.add(
-                UpdatePosition(dx: position.dx, dy: position.dy),
-              );
-            },
-            child: SizedBox(
-              width: _popupWindowSize.width,
-              child: PopupContent(
-                hadith: hadith,
-                remainingSeconds: remainingSeconds,
-                isDismissible: popupState.isDismissible,
-                onClose: () => widget.popupBloc.add(
-                  const DismissPopup(savePosition: true),
-                ),
-              ),
+      backgroundColor: const Color(0xFF0E3551),
+      body: GestureDetector(
+        onPanStart: (_) async {
+          await windowManager.startDragging();
+        },
+        onPanEnd: (_) async {
+          final position = await windowManager.getPosition();
+          widget.popupBloc.add(
+            UpdatePosition(dx: position.dx, dy: position.dy),
+          );
+        },
+        child: SizedBox.expand(
+          child: PopupContent(
+            hadith: hadith,
+            remainingSeconds: remainingSeconds,
+            isDismissible: popupState.isDismissible,
+            onClose: () => widget.popupBloc.add(
+              const DismissPopup(savePosition: true),
             ),
           ),
         ),

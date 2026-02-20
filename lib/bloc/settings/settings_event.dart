@@ -124,3 +124,13 @@ class UpdatePopupDisplayDuration extends SettingsEvent {
   @override
   List<Object?> get props => [duration];
 }
+
+/// Event to update popup layout mode (compact/spacious)
+class UpdatePopupLayoutMode extends SettingsEvent {
+  final PopupLayoutMode mode;
+
+  const UpdatePopupLayoutMode(this.mode);
+
+  @override
+  List<Object?> get props => [mode];
+}
